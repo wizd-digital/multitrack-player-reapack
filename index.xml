@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" name="Wizd Digital">
+  <category name="Multitrack Player">
+    <reapack name="multitrack_player.lua" type="script" desc="Multitrack Player">
+      <version name="0.0.1" author="Wizd Digital" time="2026-11-05T21:52:05Z">
+        <changelog>Nova versão do Multitrack Player (0.0.1).</changelog>
+        <source file="assets/fonts/Manrope-Bold.ttf">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/assets/fonts/Manrope-Bold.ttf</source>
+        <source file="assets/fonts/Manrope-ExtraBold.ttf">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/assets/fonts/Manrope-ExtraBold.ttf</source>
+        <source file="assets/fonts/Manrope-Medium.ttf">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/assets/fonts/Manrope-Medium.ttf</source>
+        <source file="assets/fonts/OFL.txt">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/assets/fonts/OFL.txt</source>
+        <source file="clicks/00.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/00.mtp</source>
+        <source file="clicks/01.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/01.mtp</source>
+        <source file="clicks/02.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/02.mtp</source>
+        <source file="clicks/03.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/03.mtp</source>
+        <source file="clicks/10.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/10.mtp</source>
+        <source file="clicks/11.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/11.mtp</source>
+        <source file="clicks/12.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/12.mtp</source>
+        <source file="clicks/13.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/13.mtp</source>
+        <source file="clicks/20.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/20.mtp</source>
+        <source file="clicks/21.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/21.mtp</source>
+        <source file="clicks/22.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/22.mtp</source>
+        <source file="clicks/23.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/23.mtp</source>
+        <source file="clicks/30.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/30.mtp</source>
+        <source file="clicks/33.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/33.mtp</source>
+        <source file="clicks/40.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/40.mtp</source>
+        <source file="clicks/41.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/41.mtp</source>
+        <source file="clicks/42.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/42.mtp</source>
+        <source file="clicks/43.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/43.mtp</source>
+        <source file="clicks/50.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/50.mtp</source>
+        <source file="clicks/51.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/51.mtp</source>
+        <source file="clicks/52.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/52.mtp</source>
+        <source file="clicks/53.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/53.mtp</source>
+        <source file="clicks/60.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/60.mtp</source>
+        <source file="clicks/61.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/61.mtp</source>
+        <source file="clicks/62.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/62.mtp</source>
+        <source file="clicks/70.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/70.mtp</source>
+        <source file="clicks/71.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/71.mtp</source>
+        <source file="clicks/72.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/72.mtp</source>
+        <source file="clicks/73.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/clicks/73.mtp</source>
+        <source file="lib/MTP_Ableton.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Ableton.lua</source>
+        <source file="lib/MTP_AbletonRun.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_AbletonRun.lua</source>
+        <source file="lib/MTP_App.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_App.lua</source>
+        <source file="lib/MTP_Beat.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Beat.lua</source>
+        <source file="lib/MTP_Click.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Click.lua</source>
+        <source file="lib/MTP_ClickPattern.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_ClickPattern.lua</source>
+        <source file="lib/MTP_ClickTrack.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_ClickTrack.lua</source>
+        <source file="lib/MTP_FreeClick.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_FreeClick.lua</source>
+        <source file="lib/MTP_FreeClickCmd.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_FreeClickCmd.lua</source>
+        <source file="lib/MTP_FreeClickRun.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_FreeClickRun.lua</source>
+        <source file="lib/MTP_Groups.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Groups.lua</source>
+        <source file="lib/MTP_Inflate.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Inflate.lua</source>
+        <source file="lib/MTP_Layout.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Layout.lua</source>
+        <source file="lib/MTP_License.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_License.lua</source>
+        <source file="lib/MTP_LicenseKey.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_LicenseKey.lua</source>
+        <source file="lib/MTP_Lyrics.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Lyrics.lua</source>
+        <source file="lib/MTP_LyricsRun.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_LyricsRun.lua</source>
+        <source file="lib/MTP_Medley.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Medley.lua</source>
+        <source file="lib/MTP_Pads.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Pads.lua</source>
+        <source file="lib/MTP_Remote.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Remote.lua</source>
+        <source file="lib/MTP_RemoteProtocol.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_RemoteProtocol.lua</source>
+        <source file="lib/MTP_Routing.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Routing.lua</source>
+        <source file="lib/MTP_RoutingRun.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_RoutingRun.lua</source>
+        <source file="lib/MTP_Setlist.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Setlist.lua</source>
+        <source file="lib/MTP_Structure.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Structure.lua</source>
+        <source file="lib/MTP_StructureRun.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_StructureRun.lua</source>
+        <source file="lib/MTP_Text.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Text.lua</source>
+        <source file="lib/MTP_Theme.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Theme.lua</source>
+        <source file="lib/MTP_Transpose.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/MTP_Transpose.lua</source>
+        <source file="lib/RegionNavCore.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/lib/RegionNavCore.lua</source>
+        <source main="main" file="mp_click_44.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_click_44.lua</source>
+        <source main="main" file="mp_click_68.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_click_68.lua</source>
+        <source main="main" file="mp_click_stop.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_click_stop.lua</source>
+        <source main="main" file="mp_click_tap.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_click_tap.lua</source>
+        <source main="main" file="mp_go_to_next_region.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_go_to_next_region.lua</source>
+        <source main="main" file="mp_go_to_previous_region.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_go_to_previous_region.lua</source>
+        <source main="main" file="mp_go_to_region_number.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/mp_go_to_region_number.lua</source>
+        <source main="main" file="multitrack_player.lua">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/multitrack_player.lua</source>
+        <source file="pads/00.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/00.mtp</source>
+        <source file="pads/01.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/01.mtp</source>
+        <source file="pads/02.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/02.mtp</source>
+        <source file="pads/03.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/03.mtp</source>
+        <source file="pads/04.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/04.mtp</source>
+        <source file="pads/05.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/05.mtp</source>
+        <source file="pads/06.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/06.mtp</source>
+        <source file="pads/07.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/07.mtp</source>
+        <source file="pads/08.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/08.mtp</source>
+        <source file="pads/09.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/09.mtp</source>
+        <source file="pads/10.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/10.mtp</source>
+        <source file="pads/11.mtp">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/pads/11.mtp</source>
+        <source file="www/diretor.html">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/www/diretor.html</source>
+        <source file="www/guia.html">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/www/guia.html</source>
+        <source file="www/letra.html">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/www/letra.html</source>
+        <source file="www/multitrack.html">https://raw.githubusercontent.com/wizd-digital/multitrack-player-reapack/v0.0.1/package/www/multitrack.html</source>
+      </version>
+    </reapack>
+  </category>
+</index>
