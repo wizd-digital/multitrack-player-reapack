@@ -76,6 +76,8 @@
   .seg { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-button); padding: 3px; gap: 3px; }
   .seg button { min-height: 42px; background: transparent; font-size: 14px; }
   .seg button:active { background: var(--surface-2); }
+  /* director-phone-layout D7: the three voice buttons share the width on a narrow phone */
+  @media (max-width: 359px) { .seg { display: flex; width: 100%; } .seg button { flex: 1 1 0; min-width: 0; padding: 0 4px; font-size: 13px; } }
   textarea { width: 100%; min-height: 50vh; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-button);
     padding: 12px 14px; font: 15px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; resize: vertical; }
   .help { color: var(--muted); font-size: 14px; margin: 6px 0 0; line-height: 1.4; }
@@ -132,7 +134,7 @@
 
 <div id="pair" class="card hidden">
   <div class="ttl">Parear este aparelho</div>
-  <p class="help">Para editar letras, este aparelho precisa estar pareado. No computador, clique em <b>REMOTO</b> e digite o código abaixo. Se ele já foi pareado no <a href="multitrack.html" style="color:var(--accent)">controle</a>, recarregue esta página.</p>
+  <p class="help">Para editar letras, este aparelho precisa estar pareado. No computador, clique em <b>REMOTO</b> e digite o código abaixo.</p>
   <input id="code" class="code" inputmode="numeric" maxlength="6" placeholder="000000">
   <button id="pairBtn" class="on">PAREAR</button>
   <p id="pairMsg"></p>
@@ -218,7 +220,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 // Comando com seq e confirmação (mesmo protocolo dos botões do controle).
 async function command(op, arg, waitMs) {
   if (!state) throw new Error("sem estado");
-  seq++; store.set("seq", String(seq));
+  seq = Math.max(seq, parseInt(store.get("seq") || "0", 10) || 0) + 1; store.set("seq", String(seq));
   const text = [state.boot, seq, token, op, "", arg].join("|");
   const until = Date.now() + (waitMs || 3000);
   while (Date.now() < until) {
@@ -485,6 +487,15 @@ function originalLinks() {
 }
 window.addEventListener("beforeunload", (e) => { if (isDirty()) { e.preventDefault(); e.returnValue = ""; } });
 
+// Another tab of this browser paired or was revoked: follow it right away.
+window.addEventListener("storage", (e) => {
+  if (e.key !== "mtp.token") return;
+  token = e.newValue;
+  if (!token) conn = "unpaired";
+  renderConn();
+  clearTimeout(poll.timer); poll();
+});
+
 async function poll() {
   const now = Date.now();
   try {
@@ -501,7 +512,7 @@ async function poll() {
     }
   } catch (e) { conn = "retry"; }
   renderConn();
-  setTimeout(poll, POLL_MS);
+  clearTimeout(poll.timer); poll.timer = setTimeout(poll, POLL_MS);
 }
 
 const PILLS = { ok: ["conectado", "ok"], connecting: ["conectando…", "warn"], retry: ["reconectando…", "warn"],
@@ -529,14 +540,17 @@ function renderConn() {
 // lista de músicas: a aba ativa e as do setlist (só as abertas podem ser editadas)
 function buildSongs() {
   const list = state.setlist || [];
-  const key = JSON.stringify(list.map(m => [m.name, m.open])) + (state.song && state.song.name);
+  const key = JSON.stringify(list.map(m => [m.name, m.open, !!m.clickOnly])) + (state.song && state.song.name) + !!state.clickSong;
   if (key === songsBuilt) return;
   songsBuilt = key;
   const sel = $("songSel"), cur = sel.value;
   sel.replaceChildren();
   const opt = (v, t, dis) => { const o = document.createElement("option"); o.value = v; o.textContent = t; o.disabled = !!dis; sel.append(o); };
-  opt("0", "Música da aba ativa: " + ((state.song && state.song.name) || "—"));
-  list.forEach((m, i) => opt(String(i + 1), (i + 1) + ". " + m.name + (m.open ? "" : " (abra as abas: ABRIR ABAS)"), !m.open));
+  // click-only-song: with a click-only song active the name in the state is not the tab's
+  opt("0", state.clickSong ? "Música da aba ativa" : "Música da aba ativa: " + ((state.song && state.song.name) || "—"));
+  list.forEach((m, i) => m.clickOnly
+    ? opt(String(i + 1), (i + 1) + ". " + m.name + " (só click, sem letra)", true)
+    : opt(String(i + 1), (i + 1) + ". " + m.name + (m.open ? "" : " (abra as abas: ABRIR ABAS)"), !m.open));
   sel.value = cur && [...sel.options].some(o => o.value === cur && !o.disabled) ? cur : "0";
   if (!loaded) loadSong(sel.value);
 }

@@ -57,6 +57,14 @@
 
   header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   header h1 { font-size: 15px; margin: 0; color: var(--muted); flex: 1; }
+  /* director-phone-layout D6: narrow phone standing up. Two header rows: title and
+     connection pill on top (always visible), the page links below */
+  @media (max-width: 459px) {
+    header { flex-wrap: wrap; gap: 8px; }
+    header h1 { order: 1; } header #pill { order: 2; }
+    header::after { content: ""; order: 3; flex-basis: 100%; height: 0; }   /* line break */
+    header a.pill { order: 4; flex: 1 1 0; text-align: center; }
+  }
   .pill { font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 999px; background: var(--surface); }
   .pill.ok { color: var(--success); } .pill.warn { color: var(--warning); } .pill.bad { color: var(--danger); }
 
@@ -69,7 +77,20 @@
   .onair { color: var(--live); font-weight: 800; margin-left: 8px; }
   .onair::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--live);
     margin-right: 5px; vertical-align: 1px; }
+  /* transition-timing-selector: TROCA pills; lit default in mint, lit chosen in orange.
+     Three equal flexible pills (min-width 0) so a portrait phone never scrolls sideways */
+  #timing { display: flex; align-items: center; gap: 6px; margin-top: 8px; min-width: 0; }
+  #timing .tl { font-size: 11px; color: var(--muted); font-weight: 800; letter-spacing: .06em; flex: none; }
+  #timing button { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 4px; font-size: 14px; overflow: hidden; }
+  @media (max-width: 359px) { #timing button { font-size: 12px; } #timing .tl { display: none; } }
   .mid { font-size: 18px; font-weight: 700; margin-top: 2px; overflow-wrap: anywhere; }
+  /* region-hover-and-group-colors D8: the cancel X on the PRÓXIMO card (48 px touch area, the row keeps its height) */
+  .nextrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .nextrow .mid { min-width: 0; }
+  button.xcancel { flex: 0 0 auto; min-height: 0; height: 48px; width: 56px; margin: -12px -6px -12px 0; padding: 0; background: transparent;
+    color: var(--danger); display: inline-flex; align-items: center; justify-content: center; }
+  button.xcancel svg { width: 34px; height: 24px; padding: 6px 8px; box-sizing: border-box; border: 2px solid var(--danger); border-radius: 6px; }
+  button.xcancel.late { opacity: .31; }
   .badge { font-size: 11px; font-weight: 800; color: var(--warning); margin-left: 6px; }
   .blinktext { animation: blink 1s steps(2, start) infinite; }
 
@@ -152,7 +173,9 @@
     </div>
     <div class="card">
       <div class="label"><span>PRÓXIMO</span><span id="nextNote"></span></div>
-      <div class="mid" id="next">—</div>
+      <div class="nextrow"><div class="mid" id="next">—</div><button id="nextX" class="xcancel hidden" aria-label="Cancelar o pulo"><svg viewBox="0 0 14 10"><path d="M2 1 L12 9 M12 1 L2 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>
+      <div id="timing" class="hidden"><span class="tl">TROCA</span>
+        <button data-timing="region">REGIÃO</button><button data-timing="bar">COMPASSO</button><button data-timing="now">AGORA</button></div>
     </div>
     <div class="row two transport">
       <button data-op="play" id="btnPlay">PLAY / STOP</button>
@@ -185,7 +208,8 @@
 // escreve e lê ExtState na seção MTP_Remote; o player lê, executa e publica.
 const SEC = "MTP_Remote";
 const POLL_MS = 200, BACKOFF_MS = [1000, 2000], CONFIRM_MS = 3000, STALE_HB_MS = 2000, HB_EVERY_MS = 2000;
-const SENSITIVE = { play: 1, pause: 1, prev: 1, next: 1, repeat: 1, loop: 1, click: 1, song: 1 };
+// act: a window action by name; the phone only sends CancelJump, which needs the rev
+const SENSITIVE = { play: 1, pause: 1, prev: 1, next: 1, repeat: 1, loop: 1, click: 1, song: 1, act: 1 };
 const enc = encodeURIComponent;
 const $ = (id) => document.getElementById(id);
 
@@ -236,6 +260,15 @@ function toast(msg, ms) {
   const t = $("toast"); t.textContent = msg; t.classList.remove("hidden");
   clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.add("hidden"), ms || 3500);
 }
+
+// Another tab of this browser paired or was revoked: follow it right away.
+window.addEventListener("storage", (e) => {
+  if (e.key !== "mtp.token") return;
+  token = e.newValue;
+  if (!token) setConn("unpaired");
+  render();
+  clearTimeout(poll.timer); poll();
+});
 
 // ======================= laço de consulta =======================
 async function poll() {
@@ -297,10 +330,10 @@ function setConn(c) {
 function send(op, arg, button) {
   if (conn !== "ok" || !fresh || !state) return;
   if (pending) { toast("Aguarde a confirmação do comando anterior."); return; }
-  seq++; store.set("seq", String(seq));
+  seq = Math.max(seq, parseInt(store.get("seq") || "0", 10) || 0) + 1; store.set("seq", String(seq));
   const rev = SENSITIVE[op] ? String(state.rev) : "";
   const text = [state.boot, seq, token, op, rev, arg == null ? "" : String(arg)].join("|");
-  pending = { seq, op, text, firstAt: Date.now(), button };
+  pending = { seq, op, arg, text, firstAt: Date.now(), button };
   if (button) button.classList.add("blink");
   clearTimeout(poll.timer); poll();   // envia já
 }
@@ -319,6 +352,7 @@ function handleAck(raw, now) {
       if (status === "stale") return finish("O trecho mudou; confira e toque de novo.");
       if (status === "denied") { token = null; store.del("token"); return finish("Este aparelho precisa ser pareado de novo."); }
       if (status === "off") return finish("Controle remoto desligado no computador.");
+      if (pending.op === "act" && pending.arg === "CancelJump") return finish("Tarde demais para cancelar o pulo.");
       return finish("Comando não aceito pelo player.");
     }
   }
@@ -404,6 +438,12 @@ function render() {
   $("next").textContent = nx.name ? "> " + nx.name : "—";
   $("next").classList.toggle("blinktext", !!nx.pending);
   $("nextNote").textContent = nx.approx ? "aprox." : "";
+  renderTiming(state.timing, enabled);
+  // region-hover-and-group-colors D8: the X whenever the window could cancel (absent in older players)
+  const xSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  $("nextX").classList.toggle("hidden", !xSt);
+  $("nextX").classList.toggle("late", xSt === "late");
+  $("nextX").dataset.state = xSt || "";
 
   $("btnPlay").classList.toggle("live", state.play === "playing");
   $("btnPause").classList.toggle("on", state.play === "paused");
@@ -426,7 +466,9 @@ function render() {
   renderList("setlist", state.setlist || [], (m, i) => {
     const next = m.next && !m.active;
     const b = el("button", (m.active ? "current " : "") + (next ? "next " : "") + (m.missing ? "bad" : ""));
-    const meta = el("span", "meta", m.missing ? "não encontrada" : (m.medley ? "MEDLEY" : ""));
+    // click-only-song: a song without VS shows "CLICK 72 · D"
+    const tag = m.clickOnly ? "CLICK " + m.bpm + (m.keyLabel ? " · " + m.keyLabel : "") : (m.medley ? "MEDLEY" : "");
+    const meta = el("span", "meta", m.missing ? "não encontrada" : tag);
     if (next && !m.missing) meta.prepend(el("span", "tagnext", "PRÓXIMA" + (m.medley ? " · " : "")));
     b.append(el("span", null, (i + 1) + ". " + m.name), meta);
     b.disabled = !enabled || m.missing;
@@ -446,7 +488,31 @@ function renderList(id, items, make, extra) {
   const box = $(id); box.replaceChildren(...items.map(make));
 }
 
+// TROCA selector: hidden when the player does not publish `timing`; dimmed and inert when
+// opts is empty; only the options in opts are shown.
+function renderTiming(t, enabled) {
+  const box = $("timing");
+  const has = !!t && Array.isArray(t.opts);
+  box.classList.toggle("hidden", !has);
+  if (!has) return;
+  const off = t.opts.length === 0;
+  box.style.opacity = off ? ".35" : "";
+  box.querySelectorAll("button").forEach(b => {
+    const m = b.dataset.timing;
+    b.classList.toggle("hidden", !off && t.opts.indexOf(m) < 0);
+    const lit = !off && t.on === m;
+    b.classList.toggle("on", lit && t.on === t.def);
+    b.classList.toggle("live", lit && t.on !== t.def);
+    b.disabled = off || !enabled;
+  });
+}
+document.querySelectorAll("#timing button").forEach(b => b.onclick = () => send("act", "SetTiming|" + b.dataset.timing, b));
+
 document.querySelectorAll("#controls button[data-op]").forEach(b => b.onclick = () => send(b.dataset.op, null, b));
+// dimmed = too late: nothing is sent, same as the X in the window
+$("nextX").onclick = () => {
+  if ($("nextX").dataset.state === "ok") send("act", "CancelJump", $("nextX")); else toast("Tarde demais para cancelar o pulo.");
+};
 
 render();
 poll();

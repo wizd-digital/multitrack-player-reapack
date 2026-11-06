@@ -85,6 +85,21 @@
   .badge { color: var(--success); font-weight: 800; }
   /* ui-mock-alignment D6: next destination in gray; ghost button for secondary actions */
   #cNext { color: var(--muted); }
+  /* transition-timing-selector: TROCA pills; lit default in mint, lit chosen in orange */
+  /* region-hover-and-group-colors D10: a column beside PRÓXIMO, as tall as the cards (4th column of .cards) */
+  .cards { grid-template-columns: 1fr 1.4fr 1fr auto; }
+  #timing { display: flex; flex-direction: column; gap: 3px; width: 96px; min-width: 0; }
+  #timing .tl { display: none; font-size: 10px; color: var(--muted); font-weight: 800; letter-spacing: .06em; flex: none; }
+  #timing button { flex: 1 1 0; min-width: 0; min-height: 0; padding: 0 4px; font-size: 12px; overflow: hidden; text-overflow: clip; }
+  #timing.off button { opacity: .35; pointer-events: none; }
+  /* region-hover-and-group-colors D8: the cancel X on the PRÓXIMO card, same look as the X on the block */
+  button.xcancel { min-height: 0; height: 26px; width: 38px; padding: 0; margin: -3px 0; flex: 0 0 auto; background: transparent;
+    box-shadow: inset 0 0 0 2px var(--danger); color: var(--danger); display: inline-flex; align-items: center; justify-content: center; }
+  button.xcancel.late { opacity: .31; }
+  button.xcancel svg { width: 14px; height: 10px; }
+  /* region-hover-and-group-colors D9: the block name under the mouse */
+  #waveTip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 3px 8px; font-size: 13px; font-weight: 700; white-space: nowrap; z-index: 2; }
   .song .ix { color: var(--muted); } .song .active .ix { color: inherit; opacity: .7; }
   /* ui-mock-alignment D9: pending jump pill at the bottom of the wave */
   #jumpPill { position: absolute; left: 50%; transform: translateX(-50%); bottom: 10px; max-width: 80%;
@@ -127,6 +142,9 @@
   .song .active { background: var(--accent); color: var(--on-accent); }
   .song .next { box-shadow: inset 0 0 0 2px var(--live); animation: nextring 1s steps(2, start) infinite; }
   .song .tagnext { flex: none; color: var(--live); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+  /* click-only-song: song without VS, "CLICK 72 · D" */
+  .song .tagclick { flex: none; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+  .song .active .tagclick { color: inherit; opacity: .75; }
   @keyframes nextring { to { box-shadow: inset 0 0 0 2px transparent; } }
   .song .missing { color: var(--danger); }
   .song button { min-height: 48px; padding: 0 6px; font-variant-numeric: tabular-nums; }
@@ -165,6 +183,57 @@
     #bottom { height: clamp(130px, 34vh, 220px); }
     .big { font-size: 26px; }
   }
+  /* region-hover-and-group-colors D10: up to 760 px wide, TROCA goes back to a row under PRÓXIMO */
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: 1fr 1.4fr 1fr; }
+    #timing { grid-column: 3; flex-direction: row; align-items: center; gap: 4px; width: auto; }
+    #timing .tl { display: block; }
+    #timing button { min-height: 28px; }
+  }
+  /* director-phone-layout D1: phone lying down (short screen) scrolls vertically,
+     never horizontally; the wave gets a fixed height and every box a bounded one */
+  @media (orientation: landscape) and (max-height: 599px) {
+    html, body { height: auto; }
+    body { min-height: 100vh; min-height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+    #app, .view, .cols { flex: none; }
+    /* no long press on the wave any more: a vertical drag on it scrolls the page
+       (the browser cancels the pointer, so no jump is sent) */
+    #wavebox { flex: none; height: 150px; min-height: 0; touch-action: pan-y; }
+    .pad { flex-wrap: wrap; }
+    .pad .tones { flex: 1 1 calc(100% - 160px); }
+    .pad label { display: flex; flex: 1 1 0; min-width: 0; font-size: 12px; }
+    .pad label input[type=range], .pad label select { flex: 1 1 auto; min-width: 0; width: 0; }
+    /* command bar in two rows: 11 buttons do not fit one phone-wide row */
+    .bar { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .bar .gap { display: none; }
+    .bar [data-act=Repeat], .bar #bClick, .bar #bStruct { grid-column: span 2; }
+    #bottom { height: auto; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) minmax(0, 1fr); }
+    #bottom .box { height: 230px; }
+    /* SETLIST and ESTRUTURA columns stack; each box scrolls its own list */
+    .cols3, .cols2 { grid-template-columns: minmax(0, 1fr); }
+    .cols .box { max-height: 300px; }
+    /* director-phone-layout D5: a step row in two lines. The areas follow the
+       10 children the ESTRUTURA renderer appends to #tSteps, always in this
+       order: num, name, region, -, xN, +, destination (or empty span), up, down, x */
+    .item.step { grid-template-columns: 28px 34px 34px 34px minmax(0, 1fr) minmax(0, 1fr) 34px 34px 34px;
+      grid-template-areas: "num name name name name rname rname rname rname" ". minus rep plus dest dest up dn rm"; }
+    .item.step > :nth-child(1) { grid-area: num; } .item.step > :nth-child(2) { grid-area: name; }
+    .item.step > :nth-child(3) { grid-area: rname; } .item.step > :nth-child(4) { grid-area: minus; }
+    .item.step > :nth-child(5) { grid-area: rep; } .item.step > :nth-child(6) { grid-area: plus; }
+    .item.step > :nth-child(7) { grid-area: dest; justify-self: start; } .item.step > :nth-child(8) { grid-area: up; }
+    .item.step > :nth-child(9) { grid-area: dn; } .item.step > :nth-child(10) { grid-area: rm; }
+    .item.step { padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  }
+  /* director-phone-layout D2: phone standing up shows a rotate notice instead of the
+     controls; pairing and the connection messages stay visible */
+  #rotate { display: none; }
+  @media (orientation: portrait) and (max-width: 599px) {
+    #app, #tabs { display: none !important; }
+    #app:not(.hidden) ~ #rotate { display: flex; }
+  }
+  #rotate { flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center;
+    padding: 24px; font-size: 20px; font-weight: 800; color: var(--text); }
+  #rotate::before { content: "\21BB"; font-size: 56px; color: var(--accent); line-height: 1; }
   #blocker { text-align: center; padding: 50px 12px; color: var(--muted); }
   #blocker b { display: block; color: var(--text); font-size: 18px; margin-bottom: 6px; }
   #pair { max-width: 420px; margin: 30px auto; }
@@ -194,7 +263,7 @@
 <div id="pair" class="hidden">
   <div class="box" style="background:var(--surface);border-radius: var(--radius-card);padding:14px">
     <b>Parear este tablet</b>
-    <p class="small">No computador, clique em <b>REMOTO</b> no player e digite o código. Se ele já foi pareado no controle, recarregue a página.</p>
+    <p class="small">No computador, clique em <b>REMOTO</b> no player e digite o código.</p>
     <input id="code" inputmode="numeric" maxlength="6" placeholder="000000">
     <div class="row"><button id="pairBtn" class="on">PAREAR</button><span id="pairMsg" class="small"></span></div>
     <p class="credit">Desenvolvido por <b>Wizd</b><span>Digital</span></p>
@@ -222,10 +291,13 @@
     <div class="card hero"><div class="lbl"><span>TRECHO ATUAL <span class="badge" id="cBadge"></span><span class="onair hidden" id="cLive">NO AR</span></span><span>RESTANTE</span></div>
       <div class="val"><span id="cCur">—</span><span id="cCurR"></span></div><div class="prog"><i id="pCur"></i></div></div>
     <div class="card"><div class="lbl"><span>PRÓXIMO</span><span id="cNextN"></span></div>
-      <div class="val"><span id="cNext">—</span></div></div>
+      <div class="val"><span id="cNext">—</span><button id="cNextX" class="xcancel hidden" aria-label="Cancelar o pulo" title="Cancelar o pulo"><svg viewBox="0 0 14 10"><path d="M2 1 L12 9 M12 1 L2 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div id="timing" class="hidden"><span class="tl">TROCA</span>
+      <button data-timing="region">REGIÃO</button><button data-timing="bar">COMPASSO</button><button data-timing="now">AGORA</button></div>
   </div>
-  <div id="wavebox"><canvas id="wave"></canvas><div id="waveHint">toque: pular · segure: loop</div>
-    <div id="jumpPill" class="hidden">Pulo agendado para <b id="jumpTo"></b> no fim do trecho</div></div>
+  <div id="wavebox"><canvas id="wave"></canvas><div id="waveHint">toque: pular</div>
+    <div id="jumpPill" class="hidden">Pulo agendado para <b id="jumpTo"></b> no fim do trecho</div>
+    <div id="waveTip" class="hidden"></div></div>
   <div class="pad" id="padBox">
     <button data-act="PadToggle" id="bPad">PAD: OFF</button>
     <button data-act="PadLink" id="bLink">LINK</button>
@@ -271,7 +343,7 @@
       <button id="mRegions">CRIAR REGIONS DE MARKERS</button><span class="small" style="align-self:center">converte os markers em regions coloridas pelo nome</span>
     </div>
     <div class="tools" style="margin-top:6px">
-      <button id="mRecolor">RECOLORIR REGIONS</button><span class="small" style="align-self:center">dá a cada region a cor da paleta pelo nome (desfaz com Ctrl+Z no computador)</span>
+      <button id="mRecolor">RECOLORIR REGIONS E TRACKS</button><span class="small" style="align-self:center">dá a cada region a cor da paleta pelo nome e a cada track a cor do grupo (desfaz com Ctrl+Z no computador)</span>
     </div>
   </div>
  </div>
@@ -299,6 +371,7 @@
   </div>
  </div>
 </div>
+<div id="rotate">Gire o celular para a horizontal</div>
 <div id="toast" class="hidden"></div>
 
 <script>
@@ -337,6 +410,15 @@ function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.rem
 let state = null, wave = null, waveRev = null, fresh = false, lastHb = null, lastHbAt = 0, conn = "connecting", failures = 0;
 let pending = null, hbCount = 0, lastHbSent = 0, stateAt = 0;
 
+// Another tab of this browser paired or was revoked: follow it right away.
+window.addEventListener("storage", (e) => {
+  if (e.key !== "mtp.token") return;
+  token = e.newValue;
+  if (!token) conn = "unpaired";
+  render();
+  clearTimeout(poll.timer); poll();
+});
+
 async function poll() {
   const now = Date.now(), cmds = [];
   if (pending && token) cmds.push("SET/EXTSTATE/" + SEC + "/cmd." + dev + "/" + enc(pending.text));
@@ -366,11 +448,31 @@ async function poll() {
 function schedule() { clearTimeout(poll.timer); if (document.hidden) return; poll.timer = setTimeout(poll, failures === 0 ? POLL_MS : BACKOFF_MS[Math.min(failures - 1, 1)]); }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) { fresh = false; failures = 0; poll(); } });
 
+// TROCA selector (transition-timing-selector): hidden when the player does not publish `timing`;
+// dimmed and inert when opts is empty; only the options in opts are shown.
+function renderTiming(t) {
+  const box = $("timing");
+  box.classList.toggle("hidden", !t || !Array.isArray(t.opts));
+  if (!t || !Array.isArray(t.opts)) return;
+  const off = t.opts.length === 0;
+  box.classList.toggle("off", off);
+  box.querySelectorAll("button").forEach((b) => {
+    const m = b.dataset.timing;
+    b.classList.toggle("hidden", !off && t.opts.indexOf(m) < 0);
+    const lit = !off && t.on === m;
+    b.classList.toggle("on", lit && t.on === t.def);
+    b.classList.toggle("live", lit && t.on !== t.def);
+  });
+}
+document.querySelectorAll("#timing button").forEach((b) => {
+  b.onclick = () => act("SetTiming", b.dataset.timing, b);
+});
+
 // ação da janela pelo nome (operação "act"); uma pendente por vez
 function act(name, value, button) {
   if (conn !== "ok" || !fresh || !state) return;
   if (pending) { toast("Aguarde a confirmação do comando anterior."); return; }
-  seq++; store.set("seq", String(seq));
+  seq = Math.max(seq, parseInt(store.get("seq") || "0", 10) || 0) + 1; store.set("seq", String(seq));
   const arg = value === undefined || value === null ? name : name + "|" + value;
   const text = [state.boot, seq, token, "act", SENSITIVE.has(name) ? String(state.rev) : "", arg].join("|");
   pending = { seq, text, firstAt: Date.now(), button, name };
@@ -400,7 +502,7 @@ $("pairBtn").onclick = async () => {
   if (code.length !== 6) { $("pairMsg").textContent = "Digite os 6 dígitos."; return; }
   const nonce = randomId(8);
   $("pairMsg").textContent = "Pareando…";
-  await api(["SET/EXTSTATE/" + SEC + "/pair/" + enc([dev, code, nonce, "Tablet do diretor"].join("|"))]);
+  await api(["SET/EXTSTATE/" + SEC + "/pair/" + enc([dev, code, nonce, (store.get("name") || "Tablet do diretor").replace(/[|\n\t]/g, " ")].join("|"))]);
   for (let i = 0; i < 25; i++) {
     const r = await api(["GET/EXTSTATE/" + SEC + "/pairres." + dev]); const res = extOf(r.rows, "pairres." + dev);
     if (res && res.startsWith(nonce + "|")) {
@@ -435,6 +537,16 @@ const BLOCKS = { connecting: ["Conectando…", ""], retry: ["Reconectando…", "
   off: ["Controle remoto desligado no computador", "No player, clique em REMOTO e ligue."],
   unlicensed: ["Player sem licença no computador", ""] };
 function fmt(sec) { sec = Math.max(0, Math.round(sec || 0)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+// structure-song-duration D6: song time by the structure ("~" approximate, "+" cyclic, remaining "—");
+// "elapsed" = seconds played since the state arrived. null = player without songTime (use songLen).
+function songTimeText(st, elapsed) {
+  if (!st || typeof st.total !== "number") return null;
+  const mark = st.approx ? "~" : "", total = mark + fmt(st.total) + (st.cyclic ? "+" : "");
+  if (typeof st.remaining !== "number") return { total, rem: "\u2014", frac: 0 };
+  const left = Math.max(0, st.remaining - (elapsed || 0));
+  const frac = st.cyclic || st.total <= 0 ? 0 : Math.min(1, Math.max(0, 1 - left / st.total));
+  return { total, rem: mark + fmt(left), frac };
+}
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 const cache = {};
 function once(key, val, fn) { const k = JSON.stringify(val); if (cache[key] !== k) { cache[key] = k; fn(); } }
@@ -463,8 +575,10 @@ function render() {
 
   // cartões
   const song = s.song || {}, cur = s.cur || {}, nx = s.next || {};
-  $("cSongL").textContent = "MÚSICA · " + fmt(s.songLen) + (song.index && song.total ? "  ·  " + song.index + "/" + song.total : "");
+  const stt = songTimeText(s.songTime, 0);
+  $("cSongL").textContent = "MÚSICA · " + (stt ? stt.total : fmt(s.songLen)) + (song.index && song.total ? "  ·  " + song.index + "/" + song.total : "");
   $("cSong").textContent = song.name || "—";
+  $("waveHint").classList.toggle("hidden", !!s.clickSong);   // click-only-song: nothing to tap
   $("cCur").textContent = cur.count ? `${cur.name} · ${cur.count}/${cur.total}` : (cur.name || "—");
   $("cBadge").textContent = s.click === "on" || s.click === "leaving" ? "CLICK" : s.loop ? "LOOP" : cur.outside ? "FORA" : "";
   // remote-pages-refresh D3: NO AR and the orange song bar only while the song plays (not in the click loop)
@@ -475,7 +589,13 @@ function render() {
   const step = (nx.name || "").match(/^(.*) · (\d+)\/(\d+)$/);
   $("cNext").textContent = nx.name ? "> " + (step ? step[1] : nx.name) : "—";
   $("cNext").classList.toggle("blinktext", !!nx.pending);
+  renderTiming(s.timing);
   $("cNextN").textContent = [step ? step[2] + " de " + step[3] : "", nx.approx ? "aprox." : ""].filter(Boolean).join(" · ");
+  // region-hover-and-group-colors D8: the X on the card whenever the window could cancel (absent in older players)
+  const xSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  $("cNextX").classList.toggle("hidden", !xSt);
+  $("cNextX").classList.toggle("late", xSt === "late");
+  $("cNextX").dataset.state = xSt || "";
   // ui-mock-alignment D9: same pill as the window while a jump is pending (not the click entry)
   const jump = !!nx.pending && !!nx.name && !nx.end && !["armed", "on", "leaving"].includes(s.click);
   $("jumpPill").classList.toggle("hidden", !jump);
@@ -545,6 +665,7 @@ function render() {
       // ui-mock-alignment D11: the number in gray
       const nm = el("span", "nm"); nm.append(el("span", "ix", (i + 1) + ". "), m.name); b.append(nm);
       if (m.next && !m.active) b.append(el("span", "tagnext", "PRÓXIMA"));
+      if (m.clickOnly) b.append(el("span", "tagclick", "CLICK " + m.bpm + (m.keyLabel ? " · " + m.keyLabel : "")));
       b.disabled = !enabled || m.missing; b.onclick = () => act("ChooseSong", i + 1, b);
       const up = el("button", null, "↑"), dn = el("button", null, "↓");
       up.disabled = !enabled || i === 0; dn.disabled = !enabled || i === list.length - 1;
@@ -568,8 +689,21 @@ function posNow() {
 function regionAt(t) { for (const r of (wave && wave.regions) || []) if (t >= r.pos && t < r.pos + r.len) return r; return null; }
 function draw() {
   const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  // director-phone-layout D3: hidden behind the rotate notice; resume on the next visible frame
+  if (!w || !h) return requestAnimationFrame(draw);
   if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
   ctx2.setTransform(dpr, 0, 0, dpr, 0, 0); ctx2.clearRect(0, 0, w, h);
+  // click-only-song: no wave, the song and its free click in its place
+  const cs = state && state.clickSong;
+  if (cs) {
+    ctx2.textAlign = "center"; ctx2.textBaseline = "middle";
+    ctx2.fillStyle = tok("muted"); ctx2.font = "800 12px sans-serif"; ctx2.fillText("MÚSICA SÓ CLICK", w / 2, h / 2 - 34);
+    ctx2.fillStyle = tok("text"); ctx2.font = "800 28px sans-serif"; ctx2.fillText(cs.name, w / 2, h / 2 - 6);
+    ctx2.font = "800 18px sans-serif";
+    ctx2.fillText("CLICK " + Math.round(cs.freeBpm || cs.bpm) + " BPM · " + cs.meter + (cs.key ? " · " + cs.key : ""), w / 2, h / 2 + 26);
+    ctx2.textAlign = "start"; ctx2.textBaseline = "alphabetic";
+    return requestAnimationFrame(draw);
+  }
   if (!wave || !(wave.span > 0)) { ctx2.fillStyle = tok("muted"); ctx2.font = "14px sans-serif"; ctx2.fillText(wave ? "Nenhuma region no projeto." : "Carregando a onda…", 10, h / 2); return requestAnimationFrame(draw); }
   const x = (t) => ((t - wave.start) / wave.span) * w;
   const pos = posNow(), stale = conn !== "ok";
@@ -628,8 +762,12 @@ function draw() {
   ctx2.beginPath(); ctx2.moveTo(px - 5, 0); ctx2.lineTo(px + 5, 0); ctx2.lineTo(px, 7); ctx2.closePath(); ctx2.fill();
   // barras dos cartões (tempo contínuo)
   if (state) {
-    const len = state.songLen || 0; $("pSong").style.width = len > 0 ? Math.min(100, 100 * (pos - wave.start) / len) + "%" : "0";
-    $("cSongR").textContent = len > 0 ? fmt(len - (pos - wave.start)) : "";
+    const stt = songTimeText(state.songTime, pos - (state.pos || 0));
+    if (stt) { $("pSong").style.width = 100 * stt.frac + "%"; $("cSongR").textContent = stt.rem; }
+    else {
+      const len = state.songLen || 0; $("pSong").style.width = len > 0 ? Math.min(100, 100 * (pos - wave.start) / len) + "%" : "0";
+      $("cSongR").textContent = len > 0 ? fmt(len - (pos - wave.start)) : "";
+    }
     const cr = curGuid && wave.regions.find(r => r.guid === curGuid);
     if (cr && state.click !== "on" && state.click !== "leaving") {
       $("pCur").style.width = Math.min(100, Math.max(0, 100 * (pos - cr.pos) / cr.len)) + "%";
@@ -638,24 +776,52 @@ function draw() {
   }
   requestAnimationFrame(draw);
 }
-// toque: pular; segurar 500 ms: loop do trecho
+// tap: jump to the block (director-phone-layout: the long press for the loop was removed).
+// region-hover-and-group-colors D9: a long press (500 ms, no drag) shows the block
+// name and does not jump; a mouse over a block shows its name beside the pointer.
+const LONG_PRESS_MS = 500, DRAG_PX = 10;
 let press = null, cancelHit = null;
+const onCancelX = (px, py) => cancelHit && px >= cancelHit.x0 && px <= cancelHit.x1 && py >= cancelHit.y0 && py <= cancelHit.y1;
+const blockAt = (e) => {
+  if (!wave || !(wave.span > 0)) return null;
+  const rect = cv.getBoundingClientRect();
+  return regionAt(wave.start + ((e.clientX - rect.left) / rect.width) * wave.span);
+};
+const hideTip = () => $("waveTip").classList.add("hidden");
 cv.addEventListener("pointerdown", (e) => {
   if (!wave || !(wave.span > 0)) return;
   const rc = cv.getBoundingClientRect(), px = e.clientX - rc.left, py = e.clientY - rc.top;
-  if (cancelHit && px >= cancelHit.x0 && px <= cancelHit.x1 && py >= cancelHit.y0 && py <= cancelHit.y1) {
+  if (onCancelX(px, py)) {
     // tap on the X: cancel the jump (dimmed = too late, nothing is sent)
     if (cancelHit.state === "ok") act("CancelJump"); else toast("Tarde demais para cancelar o pulo.");
     return;
   }
-  const rect = cv.getBoundingClientRect(), t = wave.start + ((e.clientX - rect.left) / rect.width) * wave.span, r = regionAt(t);
+  const r = blockAt(e);
   if (!r) return;
-  press = { r, timer: setTimeout(() => { if (press) { act("LoopTo", "r" + press.r.guid); toast("Loop: " + press.r.name); press = null; } }, 500) };
+  const p = { r, x: e.clientX, y: e.clientY, long: false };
+  p.timer = setTimeout(() => { if (press === p) { p.long = true; hideTip(); toast(r.name || "—"); } }, LONG_PRESS_MS);
+  press = p;
 });
-const endPress = (fire) => { if (!press) return; clearTimeout(press.timer); if (fire) act("JumpTo", "r" + press.r.guid); press = null; };
+const endPress = (fire) => {
+  if (!press) return;
+  clearTimeout(press.timer);
+  if (fire && !press.long) act("JumpTo", "r" + press.r.guid);
+  press = null;
+};
+cv.addEventListener("pointermove", (e) => {
+  if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > DRAG_PX) endPress(false);   // a drag, not a tap
+  if (e.pointerType !== "mouse") return;
+  const rc = cv.getBoundingClientRect(), px = e.clientX - rc.left, py = e.clientY - rc.top, r = blockAt(e);
+  const tip = $("waveTip");
+  if (!r || onCancelX(px, py) || (press && press.long)) return hideTip();
+  tip.textContent = r.name || "—";
+  tip.classList.remove("hidden");
+  tip.style.left = Math.max(4, Math.min(px + 12, rc.width - tip.offsetWidth - 4)) + "px";
+  tip.style.top = Math.min(py + 16, rc.height - tip.offsetHeight - 4) + "px";
+});
 cv.addEventListener("pointerup", () => endPress(true));
 cv.addEventListener("pointercancel", () => endPress(false));
-cv.addEventListener("pointerleave", () => endPress(false));
+cv.addEventListener("pointerleave", () => { endPress(false); hideTip(); });
 
 // ======================= telas de preparação (director-editors) =======================
 let tab = "live", editor = null, editorRev = null, lastNotice = null;
@@ -675,6 +841,10 @@ $("mMinor").onclick = () => act("ToggleMinor", null, $("mMinor"));
 $("mOrganize").onclick = () => act("Organize", null, $("mOrganize"));
 $("mRegions").onclick = () => act("RegionsFromMarkers", null, $("mRegions"));
 $("mRecolor").onclick = () => act("RecolorRegions", null, $("mRecolor"));
+$("cNextX").onclick = () => {
+  // dimmed = too late: nothing is sent, same as the X on the block
+  if ($("cNextX").dataset.state === "ok") act("CancelJump", null, $("cNextX")); else toast("Tarde demais para cancelar o pulo.");
+};
 $("sNew").onclick = () => { const n = prompt("Nome do novo setlist:"); if (n && n.trim()) act("SlNew", slv() + "|" + n.trim(), $("sNew")); };
 $("sRen").onclick = () => { if (!editor || !editor.setlist.name) return; const n = prompt("Novo nome do setlist:", editor.setlist.name); if (n && n.trim()) act("SlRename", slv() + "|" + n.trim(), $("sRen")); };
 $("sDel").onclick = () => { if (!editor || !editor.setlist.name) return; if (confirm("Excluir o setlist \"" + editor.setlist.name + "\"? As VS não são apagadas.")) act("SlDelete", String(slv()), $("sDel")); };
@@ -717,7 +887,8 @@ function renderEditors() {
       if (sl.name && !sl.items.length) S.append(el("div", "small", "Vazio: toque nas abas ao lado para adicionar."));
       sl.items.forEach((it, i) => {
         const row = el("div", "item seq");
-        const name = el("button", it.missing ? "bad" : null, (i + 1) + ". " + it.name + (it.missing ? " (não encontrada)" : ""));
+        const name = el("button", it.missing ? "bad" : null, (i + 1) + ". " + it.name + (it.missing ? " (não encontrada)" : "")
+          + (it.clickOnly ? "  ·  CLICK " + it.bpm + " · " + it.meter + (it.keyLabel ? " · " + it.keyLabel : "") : ""));
         const up = el("button", null, "↑"), dn = el("button", null, "↓"), rm = el("button", "alert", "x");
         name.disabled = true; up.disabled = !enabled || i === 0; dn.disabled = !enabled || i === sl.items.length - 1; rm.disabled = !enabled;
         up.onclick = () => act("MoveSong", (i + 1) + "|" + i, up);

@@ -280,7 +280,11 @@ function render() {
     const cur = state.cur || {};
     const click = state.click === "on" || state.click === "leaving";
     const idx = cur.guid ? (sectionAt(links[cur.guid]) && links[cur.guid]) : null;
-    if (lyrics && lyrics.empty) {
+    if (state.clickSong) {
+      // click-only-song: no VS and no lyrics, only the free click
+      const cs = state.clickSong;
+      notice = "SÓ CLICK · " + cs.bpm + " BPM · " + cs.meter + (cs.key ? " · " + cs.key : ""); noticeCls = "click";
+    } else if (lyrics && lyrics.empty) {
       notice = "Esta música ainda não tem letra."; noticeCls = "info";
     } else if (click) {
       notice = "ESPONTÂNEO (CLICK)"; noticeCls = "click";
