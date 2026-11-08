@@ -148,8 +148,8 @@
 
 <script>
 "use strict";
-// Só lê: o estado publicado pelo player (MTP_Remote/state) e a letra da VS
-// ativa (MTP_Remote/lyrics), lida só quando a versão muda.
+// Read-only: the state published by the player (MTP_Remote/state) and the lyrics of the active
+// VS (MTP_Remote/lyrics), read only when the version changes.
 const SEC = "MTP_Remote", POLL_MS = 300, BACKOFF_MS = [1000, 2000], STALE_HB_MS = 2000;
 const $ = (id) => document.getElementById(id);
 
@@ -167,7 +167,7 @@ async function api(cmds) {
   } finally { clearTimeout(timer); }
 }
 
-// tamanho da letra, por aparelho
+// lyrics size, per device
 // lyrics-pages-refresh D3: a tablet (700 px or wider) starts at 44 px
 let fs = window.matchMedia("(min-width: 700px)").matches ? 44 : 28;
 try { fs = parseInt(localStorage.getItem("mtp.guideFs") || String(fs), 10) || fs; } catch (e) {}
@@ -194,13 +194,13 @@ async function poll() {
   else if (!state.remoteOn) conn = "off";
   else conn = "ok";
 
-  // a letra só é lida quando a versão (ou a abertura do player) muda
+  // the lyrics are only read when the version (or the player session) changes
   if (conn === "ok" && (state.lyricsRev !== lyricsRev || state.boot !== boot)) {
     try {
       const lr = await api(["GET/EXTSTATE/" + SEC + "/lyrics"]);
       const lraw = lr.status === 200 ? extOf(lr.rows, "lyrics") : null;
       if (lraw) { lyrics = JSON.parse(lraw); lyricsRev = state.lyricsRev; boot = state.boot; buildSections(); }
-    } catch (e) { /* tenta de novo na próxima */ }
+    } catch (e) { /* try again on the next one */ }
   }
   render();
   schedule();
@@ -212,8 +212,8 @@ function schedule() {
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) { failures = 0; poll(); } });
 
-// Voz da linha (mesma regra no editor e no guia): "**" no começo = back
-// dividido, "*" = back uníssono, nada = ministro. O prefixo não aparece.
+// Voice of the line (same rule in the editor and the guide): "**" at the start = split
+// backing, "*" = unison backing, nothing = minister. The prefix is not shown.
 function lineVoice(line) {
   const m = line.match(/^(\s*)(\*\*|\*)(.*)$/);
   if (!m) return { voice: "min", text: line };
@@ -233,7 +233,7 @@ function firstLine(text) { return (text || "").split("\n").find(l => l.trim() !=
 function buildSections() {
   const box = $("sections"); box.replaceChildren(); lastCurrent = null;
   ((lyrics && lyrics.sections) || []).forEach((s, i) => {
-    // seções de mesmo nome são distintas: a associação aponta para o número (posição)
+    // sections with the same name are distinct: the link points to the number (position)
     const d = document.createElement("div"); d.className = "sec"; d.dataset.idx = i + 1;
     // lyrics-pages-refresh D2: the NO AR mark, shown only on the current section
     const h = document.createElement("h2");
@@ -244,7 +244,7 @@ function buildSections() {
     d.append(h, bar, t); box.append(d);
   });
 }
-// seção de número n (1, 2, 3…) da letra publicada, ou null
+// section number n (1, 2, 3…) of the published lyrics, or null
 function sectionAt(n) { return (n && lyrics && (lyrics.sections || [])[n - 1]) || null; }
 
 function fmt(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
@@ -260,7 +260,7 @@ const NOTICES = {
   off: "Guia indisponível: o controle remoto está desligado no computador.",
 };
 
-// próxima parte: o "remaining" é interpolado entre as consultas (D11)
+// next part: the "remaining" is interpolated between polls (D11)
 let timing = { remaining: null, at: 0, total: 0, playing: false }, nextInfo = null;
 
 function render() {
@@ -268,7 +268,7 @@ function render() {
   let current = null, soft = false, notice = null, noticeCls = "", statusText, statusCls, nextIdx = null, nextEnd = false, nextMedley = null;
 
   if (conn !== "ok") {
-    // estado não confiável: nunca mantém destaque
+    // untrusted state: never keeps a highlight
     [statusText, statusCls] = STATUS[conn] || STATUS.connecting;
     notice = NOTICES[conn] || null;
     box.classList.add("stale");
@@ -299,7 +299,7 @@ function render() {
     // lyrics-pages-refresh D1: orange "on air" while playing (and in the free click)
     statusCls = click || state.play === "playing" ? "live" : "warn";
 
-    // a seguir: a seção do próximo trecho, se conhecida, e o tempo que falta
+    // next up: the section of the next stretch, if known, and the time left
     const nx = state.next || {};
     // armed medley: the next section is in the next song (name and first line come in the state)
     nextMedley = !click && nx.medley ? { name: nx.name || "", line: nx.line || "" } : null;
@@ -330,13 +330,13 @@ function render() {
     d.classList.toggle("current", isCur && !soft);
     d.classList.toggle("soft", isCur && soft);
     if (isCur && !curEl) curEl = d;
-    // a seguinte (se não for a própria atual, numa repetição)
+    // the following one (unless it is the current one itself, in a repetition)
     const isNext = conn === "ok" && nextIdx !== null && +d.dataset.idx === nextIdx && nextIdx !== current;
     d.classList.toggle("next", isNext && !nextEl);
     if (isNext && !nextEl) nextEl = d;
   }
 
-  // tempo do trecho para a barra e a faixa
+  // time of the section for the bar and the strip
   const cur = (state && state.cur) || {};
   const playing = conn === "ok" && current !== null && !soft && typeof cur.remaining === "number";
   if (playing) {
@@ -349,7 +349,7 @@ function render() {
   nextInfo = !playing ? null
     : nextMedley ? nextMedley
     : (nextSec || nextEnd) ? { name: nextEnd ? "FIM" : nextSec.name, line: nextEnd ? "" : firstLine(nextSec.text) } : null;
-  // rola até a seção quando ela muda (não a cada consulta)
+  // scrolls to the section when it changes (not on every poll)
   if (curEl && current !== lastCurrent) {
     const top = curEl.getBoundingClientRect().top + window.scrollY - $("top").offsetHeight - 8;
     window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
@@ -357,7 +357,7 @@ function render() {
   lastCurrent = current;
 }
 
-// animação: barra de progresso contínua e a faixa dos últimos 5 s
+// animation: continuous progress bar and the strip of the last 5 s
 let bannerLine = null;
 function frame() {
   const box = $("sections"), curEl = box.querySelector(".sec.current .bar i");

@@ -206,7 +206,8 @@
     /* command bar in two rows: 11 buttons do not fit one phone-wide row */
     .bar { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
     .bar .gap { display: none; }
-    .bar [data-act=Repeat], .bar #bClick, .bar #bStruct { grid-column: span 2; }
+    /* emergency-fade-out: with FADE OUT, REPETIR takes one column so it still fits two rows of 6 */
+    .bar #bClick, .bar #bStruct { grid-column: span 2; }
     #bottom { height: auto; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr) minmax(0, 1fr); }
     #bottom .box { height: 230px; }
     /* SETLIST and ESTRUTURA columns stack; each box scrolls its own list */
@@ -274,6 +275,7 @@
  <div class="view" id="v-live">
   <div class="bar">
     <button data-act="TogglePlay" id="bPlay">PLAY / STOP</button>
+    <button data-act="FadeOut" id="bFade">FADE OUT</button>
     <button data-act="Pause" id="bPause">PAUSA</button>
     <button data-act="ToggleAutoPlay" id="bAuto">AUTO PLAY</button>
     <button data-act="ToggleLoop" id="bLoop">LOOP</button>
@@ -376,9 +378,9 @@
 
 <script>
 "use strict";
-// ======================= conexão e protocolo (como www/multitrack.html) =======================
+// ======================= connection and protocol (as in www/multitrack.html) =======================
 const SEC = "MTP_Remote", POLL_MS = 200, BACKOFF_MS = [1000, 2000], CONFIRM_MS = 3000, STALE_HB_MS = 2000, HB_EVERY_MS = 2000;
-// mesmas listas de lib/MTP_RemoteProtocol.lua (P.ACT_SENSITIVE): levam o rev
+// same lists as lib/MTP_RemoteProtocol.lua (P.ACT_SENSITIVE): they carry the rev
 const SENSITIVE = new Set(["TogglePlay", "Pause", "ToggleAutoPlay", "ToggleLoop", "ToggleClick", "Prev", "Next",
   "Repeat", "CancelJump", "StructureToggle", "ChooseSong", "MoveSong", "PadToggle", "PadLink"]);
 const $ = (id) => document.getElementById(id);
@@ -393,8 +395,8 @@ const dev = store.get("dev") || (() => { const d = "d" + randomId(15); store.set
 let token = store.get("token");
 let seq = parseInt(store.get("seq") || "0", 10) || 0;
 function unescapeReaper(s) { return s.replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c === "t" ? "\t" : c); }
-// o JSON do player escreve uma lista vazia como {}: vira [] (um objeto vazio
-// lido como [] continua sem campos)
+// the player JSON writes an empty list as {}: it becomes [] (an empty object
+// read as [] still has no fields)
 const parseState = (raw) => JSON.parse(raw, (k, v) => v && typeof v === "object" && !Array.isArray(v) && !Object.keys(v).length ? [] : v);
 function extOf(rows, key) { for (const r of rows) if (r[0] === "EXTSTATE" && r[2] === key) return unescapeReaper(r.slice(3).join("\t")); return null; }
 async function api(cmds) {
@@ -439,7 +441,7 @@ async function poll() {
   else if (!token || !(st.devices || []).includes(dev)) conn = "unpaired";
   else conn = "ok";
   if (pending) handleAck(extOf(r.rows, "ack." + dev), now);
-  // a onda só é lida quando a versão muda
+  // the wave is only read when the version changes
   if (conn === "ok" && state.waveRev !== waveRev) {
     try { const w = await api(["GET/EXTSTATE/" + SEC + "/wave"]); const wr = extOf(w.rows, "wave"); if (wr) { wave = parseState(wr); waveRev = state.waveRev; } } catch (e) {}
   }
@@ -468,7 +470,7 @@ document.querySelectorAll("#timing button").forEach((b) => {
   b.onclick = () => act("SetTiming", b.dataset.timing, b);
 });
 
-// ação da janela pelo nome (operação "act"); uma pendente por vez
+// window action by name ("act" operation); one pending at a time
 function act(name, value, button) {
   if (conn !== "ok" || !fresh || !state) return;
   if (pending) { toast("Aguarde a confirmação do comando anterior."); return; }
@@ -496,7 +498,7 @@ function handleAck(raw, now) {
   if (now - pending.firstAt > CONFIRM_MS) finish("Não confirmado. Confira no player.");
 }
 
-// ======================= pareamento (o mesmo do controle) =======================
+// ======================= pairing (the same as the control) =======================
 $("pairBtn").onclick = async () => {
   const code = $("code").value.replace(/\D/g, "");
   if (code.length !== 6) { $("pairMsg").textContent = "Digite os 6 dígitos."; return; }
@@ -515,7 +517,7 @@ $("pairBtn").onclick = async () => {
   $("pairMsg").textContent = "Sem resposta do player.";
 };
 
-// ======================= botões =======================
+// ======================= buttons =======================
 document.querySelectorAll("button[data-act]").forEach(b => b.onclick = () => act(b.dataset.act, null, b));
 $("kReset").onclick = () => act("ResetKey", null, $("kReset"));
 $("bMinus").onclick = () => act("NudgeBpm", -1, $("bMinus"));
@@ -528,7 +530,7 @@ $("padVol").addEventListener("change", (e) => act("PadVolume", (e.target.value /
 $("padPan").addEventListener("change", (e) => act("PadPan", (e.target.value / 100).toFixed(2)));
 $("padOut").addEventListener("change", (e) => act("PadOutput", e.target.value));
 
-// ======================= tela =======================
+// ======================= screen =======================
 const PILLS = { ok: ["conectado", "ok"], connecting: ["conectando…", "warn"], retry: ["reconectando…", "warn"], auth: ["senha recusada", "bad"],
   closed: ["player fechado", "bad"], off: ["remoto desligado", "warn"], unlicensed: ["sem licença", "bad"], unpaired: ["não pareado", "warn"] };
 const BLOCKS = { connecting: ["Conectando…", ""], retry: ["Reconectando…", "Sem resposta do computador."],
@@ -563,9 +565,10 @@ function render() {
   document.querySelectorAll("#v-live button, #v-live input, #v-live select").forEach(e => e.disabled = !enabled);
   const s = state;
 
-  // comandos
+  // commands
   $("bPlay").classList.toggle("live", s.play === "playing");
   $("bPause").classList.toggle("on", s.play === "paused");
+  $("bFade").classList.toggle("alert", !!s.fading);   // emergency-fade-out; absent in older players
   $("bAuto").classList.toggle("on", !!s.autoPlay);
   $("bLoop").classList.toggle("on", !!s.loop);
   $("bStruct").classList.toggle("on", !!s.structure);
@@ -573,7 +576,7 @@ function render() {
   if (!(pending && pending.button === cb)) cb.classList.toggle("blink", s.click === "armed");
   if (s.click === "unavailable") cb.disabled = true;
 
-  // cartões
+  // cards
   const song = s.song || {}, cur = s.cur || {}, nx = s.next || {};
   const stt = songTimeText(s.songTime, 0);
   $("cSongL").textContent = "MÚSICA · " + (stt ? stt.total : fmt(s.songLen)) + (song.index && song.total ? "  ·  " + song.index + "/" + song.total : "");
@@ -601,7 +604,7 @@ function render() {
   $("jumpPill").classList.toggle("hidden", !jump);
   $("jumpTo").textContent = jump ? (step ? step[1] : nx.name) : "";
 
-  // tom e BPM
+  // key and BPM
   const k = s.key || {};
   // ui-mock-alignment D10: the offset before the key when transposed ("+2 · A")
   const off = k.transpose ? (k.transpose > 0 ? "+" : "") + k.transpose : "";
@@ -676,7 +679,7 @@ function render() {
   });
 }
 
-// ======================= onda e blocos (canvas) =======================
+// ======================= wave and blocks (canvas) =======================
 const cv = $("wave"), ctx2 = cv.getContext("2d");
 // design-system: canvas colors come from the page tokens (#RRGGBB), with an optional alpha suffix
 const rootCss = getComputedStyle(document.documentElement);
@@ -760,7 +763,7 @@ function draw() {
   // position: orange line with a small triangle on top (faded while the connection is not trusted)
   const px = x(pos); ctx2.fillStyle = stale ? tok("live", "60") : tok("live"); ctx2.fillRect(px - 1, 0, 2, h);
   ctx2.beginPath(); ctx2.moveTo(px - 5, 0); ctx2.lineTo(px + 5, 0); ctx2.lineTo(px, 7); ctx2.closePath(); ctx2.fill();
-  // barras dos cartões (tempo contínuo)
+  // card bars (continuous time)
   if (state) {
     const stt = songTimeText(state.songTime, pos - (state.pos || 0));
     if (stt) { $("pSong").style.width = 100 * stt.frac + "%"; $("cSongR").textContent = stt.rem; }
@@ -823,7 +826,7 @@ cv.addEventListener("pointerup", () => endPress(true));
 cv.addEventListener("pointercancel", () => endPress(false));
 cv.addEventListener("pointerleave", () => { endPress(false); hideTip(); });
 
-// ======================= telas de preparação (director-editors) =======================
+// ======================= preparation screens (director-editors) =======================
 let tab = "live", editor = null, editorRev = null, lastNotice = null;
 document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
   tab = b.dataset.tab;
@@ -854,7 +857,7 @@ $("tUse").onclick = () => act("StructureToggle", null, $("tUse"));
 function renderEditors() {
   if (!state || !editor) return;
   const enabled = conn === "ok" && fresh;
-  // botões fixos das abas; os das listas são refeitos com o estado de cada linha
+  // fixed tab buttons; the list ones are rebuilt with the state of each row
   for (const id of ["mMinor", "mOrganize", "mRegions", "mRecolor", "sNew", "sOpenAll", "tUse"]) $(id).disabled = !enabled;
   if (tab === "music") {
     const k = state.key || {};
@@ -942,12 +945,12 @@ function renderEditors() {
   }
 }
 
-// avisos da janela (ex.: resultado do ORGANIZAR): cada um uma vez
+// window notices (e.g. the ORGANIZAR result): each one once
 let noticeSeeded = false;
 function showNotice() {
   if (!state || conn !== "ok") return;
   const id = state.notice ? state.notice.id : 0;
-  // ao abrir a página, o aviso que já estava na janela não é "novo"
+  // when the page opens, the notice already in the window is not "new"
   if (!noticeSeeded) { noticeSeeded = true; lastNotice = id; return; }
   if (state.notice && id !== lastNotice) { lastNotice = id; toast(state.notice.text); }
 }

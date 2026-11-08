@@ -181,6 +181,10 @@
       <button data-op="play" id="btnPlay">PLAY / STOP</button>
       <button data-op="pause" id="btnPause">PAUSA</button>
     </div>
+    <!-- emergency-fade-out: the VS fades to silence and stops (red while fading) -->
+    <div class="row">
+      <button data-op="fadeout" id="btnFade">FADE OUT</button>
+    </div>
     <div class="row three">
       <button data-op="prev">&lt;</button>
       <button data-op="repeat">REPETIR</button>
@@ -203,9 +207,9 @@
 
 <script>
 "use strict";
-// ======================= protocolo (ver lib/MTP_RemoteProtocol.lua) =======================
-// Tudo passa pela API do servidor web do REAPER: /_/cmd;cmd;... A página só
-// escreve e lê ExtState na seção MTP_Remote; o player lê, executa e publica.
+// ======================= protocol (see lib/MTP_RemoteProtocol.lua) =======================
+// Everything goes through the REAPER web server API: /_/cmd;cmd;... The page only
+// writes and reads ExtState in the MTP_Remote section; the player reads, runs and publishes.
 const SEC = "MTP_Remote";
 const POLL_MS = 200, BACKOFF_MS = [1000, 2000], CONFIRM_MS = 3000, STALE_HB_MS = 2000, HB_EVERY_MS = 2000;
 // act: a window action by name; the phone only sends CancelJump, which needs the rev
@@ -213,8 +217,8 @@ const SENSITIVE = { play: 1, pause: 1, prev: 1, next: 1, repeat: 1, loop: 1, cli
 const enc = encodeURIComponent;
 const $ = (id) => document.getElementById(id);
 
-// localStorage pode falhar (aba privada): a página funciona, só pede o
-// pareamento de novo depois.
+// localStorage may fail (private tab): the page works, it just asks for
+// pairing again later.
 const store = {
   get(k) { try { return localStorage.getItem("mtp." + k); } catch (e) { return null; } },
   set(k, v) { try { localStorage.setItem("mtp." + k, v); } catch (e) {} },
@@ -228,7 +232,7 @@ const dev = store.get("dev") || (() => { const d = "d" + randomId(15); store.set
 let token = store.get("token");
 let seq = parseInt(store.get("seq") || "0", 10) || 0;
 
-// Valor do EXTSTATE na resposta do REAPER: \n, \t e \\ vêm codificados.
+// EXTSTATE value in the REAPER response: \n, \t and \\ come encoded.
 function unescapeReaper(s) {
   return s.replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c === "t" ? "\t" : c);
 }
@@ -246,9 +250,9 @@ async function api(cmds) {
   } finally { clearTimeout(timer); }
 }
 
-// ======================= estado da página =======================
-let state = null;          // último estado publicado pelo player
-let fresh = false;         // estado lido depois da última (re)conexão
+// ======================= page state =======================
+let state = null;          // last state published by the player
+let fresh = false;         // state read after the last (re)connection
 let lastHb = null, lastHbAt = 0;
 let conn = "connecting";   // connecting | ok | retry | auth | closed | off | unlicensed | unpaired
 let failures = 0;
@@ -270,7 +274,7 @@ window.addEventListener("storage", (e) => {
   clearTimeout(poll.timer); poll();
 });
 
-// ======================= laço de consulta =======================
+// ======================= poll loop =======================
 async function poll() {
   const cmds = [];
   const now = Date.now();
@@ -290,10 +294,10 @@ async function poll() {
   if (r.status === 401) { failures++; fresh = false; setConn("auth"); render(); return schedule(); }
   failures = 0;
 
-  // estado e batimento
+  // state and heartbeat
   const raw = extOf(r.rows, "state");
   if (raw) {
-    try { state = JSON.parse(raw); } catch (e) { /* estado a meio: espera o próximo */ }
+    try { state = JSON.parse(raw); } catch (e) { /* half-written state: wait for the next one */ }
   } else {
     state = null;
   }
@@ -313,7 +317,7 @@ async function poll() {
 
 function schedule() {
   clearTimeout(poll.timer);
-  if (document.hidden) return;   // aba oculta: para de consultar
+  if (document.hidden) return;   // hidden tab: stop polling
   const wait = failures === 0 ? POLL_MS : BACKOFF_MS[Math.min(failures - 1, BACKOFF_MS.length - 1)];
   poll.timer = setTimeout(poll, wait);
 }
@@ -326,7 +330,7 @@ function setConn(c) {
   conn = c;
 }
 
-// ======================= comandos =======================
+// ======================= commands =======================
 function send(op, arg, button) {
   if (conn !== "ok" || !fresh || !state) return;
   if (pending) { toast("Aguarde a confirmação do comando anterior."); return; }
@@ -335,7 +339,7 @@ function send(op, arg, button) {
   const text = [state.boot, seq, token, op, rev, arg == null ? "" : String(arg)].join("|");
   pending = { seq, op, arg, text, firstAt: Date.now(), button };
   if (button) button.classList.add("blink");
-  clearTimeout(poll.timer); poll();   // envia já
+  clearTimeout(poll.timer); poll();   // send right away
 }
 
 function finish(msg) {
@@ -356,12 +360,12 @@ function handleAck(raw, now) {
       return finish("Comando não aceito pelo player.");
     }
   }
-  // o player foi reaberto: o pedido era para a abertura anterior
+  // the player was reopened: the request was for the previous session
   if (state && pending.text.split("|")[0] !== state.boot) return finish("O player foi reaberto; confira e toque de novo.");
   if (now - pending.firstAt > CONFIRM_MS) finish("Não confirmado. Confira no player e toque de novo se precisar.");
 }
 
-// ======================= pareamento =======================
+// ======================= pairing =======================
 $("devname").value = store.get("name") || (/iPad/.test(navigator.userAgent) ? "iPad" :
   /iPhone/.test(navigator.userAgent) ? "iPhone" : /Android/.test(navigator.userAgent) ? "Android" : "Aparelho");
 $("pairBtn").onclick = async () => {
@@ -393,7 +397,7 @@ function handlePairRes(raw, now) {
   if (now - pairReq.at > 5000) { pairReq = null; $("pairMsg").textContent = "Sem resposta do player. O player está aberto?"; }
 }
 
-// ======================= tela =======================
+// ======================= screen =======================
 const BLOCKS = {
   connecting: ["Conectando…", ""],
   retry: ["Reconectando…", "Sem resposta do computador. Confira se o celular está no mesmo Wi-Fi."],
@@ -413,7 +417,7 @@ function render() {
   const pill = $("pill"); pill.textContent = pillText; pill.className = "pill " + pillCls;
   $("blocker").classList.toggle("hidden", !BLOCKS[conn] || conn === "ok");
   $("pair").classList.toggle("hidden", conn !== "unpaired");
-  // em "reconectando", mantém o último controle visível, mas sem botões
+  // while "reconectando", keeps the last control visible, but without buttons
   const showControl = conn === "ok" || (conn === "retry" && state && token);
   $("control").classList.toggle("hidden", !showControl);
   if (BLOCKS[conn] && !showControl) { $("blockTitle").textContent = BLOCKS[conn][0]; $("blockText").textContent = BLOCKS[conn][1]; }
@@ -447,6 +451,7 @@ function render() {
 
   $("btnPlay").classList.toggle("live", state.play === "playing");
   $("btnPause").classList.toggle("on", state.play === "paused");
+  $("btnFade").classList.toggle("alert", !!state.fading);   // absent in older players
   $("btnLoop").classList.toggle("on", !!state.loop);
   const clickBtn = $("btnClick");
   clickBtn.classList.toggle("alert", state.click === "on" || state.click === "leaving" || state.click === "armed");
@@ -479,7 +484,7 @@ function render() {
   $("setlistTitle").classList.toggle("hidden", !(state.setlist || []).length);
 }
 
-// Redesenha a lista só quando muda (não perde o toque no meio da consulta).
+// Redraws the list only when it changes (does not lose the touch in the middle of a poll).
 const listCache = {};
 function renderList(id, items, make, extra) {
   const key = JSON.stringify(items) + (conn === "ok" && fresh) + (pending ? pending.seq : "") + (extra || "");

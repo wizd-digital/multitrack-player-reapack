@@ -29,6 +29,9 @@ O ReaPack instala o player em `Scripts/Wizd Digital/Multitrack Player/` e já ca
 - `mp_go_to_next_region.lua`, `mp_go_to_previous_region.lua` e `mp_go_to_region_number.lua` (navegação por regiões)
 - `mp_play_pause.lua` (play/stop do player no Espaço, com o foco em qualquer lugar)
 - `mp_change_at_bar.lua` e `mp_change_now.lua` (momento da troca: fim do compasso e agora, para uma tecla ou pedal)
+- `mp_fade_out.lua` (saída de emergência: a VS cai até o silêncio e para, para uma tecla ou pedal)
+
+As vozes do guia falado (pasta `guides/`) vêm junto, sem download.
 
 Na primeira vez, o player abre na tela **LICENÇA**, com o código desta máquina para pedir a chave.
 

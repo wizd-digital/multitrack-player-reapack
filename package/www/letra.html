@@ -185,7 +185,7 @@
 
 <script>
 "use strict";
-// ======================= conexão e protocolo (como www/multitrack.html) =======================
+// ======================= connection and protocol (as in www/multitrack.html) =======================
 const SEC = "MTP_Remote", POLL_MS = 400, STALE_HB_MS = 2000, PART = 760, PARTS_PER_REQ = 8;
 const $ = (id) => document.getElementById(id);
 const enc = encodeURIComponent;
@@ -197,7 +197,7 @@ function randomId(n) {
   const a = new Uint8Array(n); crypto.getRandomValues(a);
   return Array.from(a, b => "abcdefghijklmnopqrstuvwxyz0123456789"[b % 36]).join("");
 }
-// mesmo aparelho e token do controle remoto (mesma origem)
+// same device and token as the remote control (same origin)
 const dev = store.get("dev") || (() => { const d = "d" + randomId(15); store.set("dev", d); return d; })();
 let token = store.get("token");
 let seq = parseInt(store.get("seq") || "0", 10) || 0;
@@ -217,7 +217,7 @@ async function api(cmds) {
 }
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-// Comando com seq e confirmação (mesmo protocolo dos botões do controle).
+// Command with seq and ack (same protocol as the control buttons).
 async function command(op, arg, waitMs) {
   if (!state) throw new Error("sem estado");
   seq = Math.max(seq, parseInt(store.get("seq") || "0", 10) || 0) + 1; store.set("seq", String(seq));
@@ -235,7 +235,7 @@ async function command(op, arg, waitMs) {
   return "timeout";
 }
 
-// ======================= SHA-256 (crypto.subtle só existe em HTTPS) =======================
+// ======================= SHA-256 (crypto.subtle only exists on HTTPS) =======================
 function sha256Hex(bytes) {
   const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
   const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
@@ -265,9 +265,9 @@ function b64url(bytes) {
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-// ======================= seções (mesmas regras de lib/MTP_Lyrics.lua) =======================
-// O número de uma seção é a sua posição (1, 2, 3…); nomes repetidos são
-// seções distintas (letra corrida, com cada repetição escrita).
+// ======================= sections (same rules as lib/MTP_Lyrics.lua) =======================
+// The number of a section is its position (1, 2, 3…); repeated names are
+// distinct sections (lyrics written out, with each repetition written).
 const UNTITLED = "Sem título";
 function parseSections(text) {
   const out = [], warnings = [];
@@ -287,11 +287,11 @@ function parseSections(text) {
   return { sections: out, warnings };
 }
 
-// Para onde foi cada seção depois de uma edição: { [número antigo]: número
-// novo }, sem as que não puderam ser identificadas (mesma regra de
-// Lyrics.Remap em lib/MTP_Lyrics.lua): 1. LCS das seções idênticas (nome e
-// texto); 2. entre esses pares, LCS só dos nomes; 3. no que sobra, trechos de
-// mesmo tamanho dos dois lados são renomeações. Números começam em 1.
+// Where each section went after an edit: { [old number]: new
+// number }, without the ones that could not be identified (same rule as
+// Lyrics.Remap in lib/MTP_Lyrics.lua): 1. LCS of the identical sections (name and
+// text); 2. between those pairs, LCS of the names only; 3. in what is left, stretches of
+// the same size on both sides are renames. Numbers start at 1.
 function lcsPairs(old, neu, i0, i1, j0, j1, key) {
   const L = {};
   for (let i = i1 + 1; i >= i0; i--) {
@@ -327,7 +327,7 @@ function remapSections(old, neu) {
   return map;
 }
 
-// Rótulo de uma seção na associação: número, nome, primeira linha e vozes (D5)
+// Label of a section in the link: number, name, first line and voices (D5)
 const VOICE_NAMES = { min: "ministro", uni: "uníssono", div: "dividido" };
 function voiceSummary(text) {
   const voices = new Set(text.split("\n").filter(l => l.trim() !== "").map(l => lineVoice(l).voice));
@@ -341,9 +341,9 @@ function sectionLabel(s, n) {
   return n + ". " + s.name + (line ? " — " + line : "") + " · " + voiceSummary(s.text);
 }
 
-// ======================= vozes (mesma regra de www/guia.html) =======================
-// Voz da linha (mesma regra no editor e no guia): "**" no começo = back
-// dividido, "*" = back uníssono, nada = ministro. O prefixo não aparece.
+// ======================= voices (same rule as www/guia.html) =======================
+// Voice of the line (same rule in the editor and the guide): "**" at the start = split
+// backing, "*" = unison backing, nothing = minister. The prefix is not shown.
 function lineVoice(line) {
   const m = line.match(/^(\s*)(\*\*|\*)(.*)$/);
   if (!m) return { voice: "min", text: line };
@@ -359,8 +359,8 @@ function renderVoices(el, text) {
   });
 }
 
-// botões: aplicam a voz às linhas da seleção (ou à linha do cursor), sem
-// mexer nos títulos [Seção] nem nas linhas vazias
+// buttons: apply the voice to the lines of the selection (or to the cursor line), without
+// touching the [Seção] titles or the blank lines
 function setLineVoice(prefix) {
   const ta = $("text"), v = ta.value;
   const a = v.lastIndexOf("\n", ta.selectionStart - 1) + 1;
@@ -378,7 +378,7 @@ $("markMin").onclick = () => setLineVoice("");
 $("markUni").onclick = () => setLineVoice("*");
 $("markDiv").onclick = () => setLineVoice("**");
 
-// colar do Word / Google Docs: negrito -> *…*, vermelho -> {…} (D10)
+// paste from Word / Google Docs: bold -> *…*, red -> {…} (D10)
 function cssColorRed(c) {
   if (!c) return false;
   c = c.trim().toLowerCase();
@@ -391,11 +391,11 @@ function cssColorRed(c) {
 }
 function htmlToMarked(html) {
   const doc = new DOMParser().parseFromString(html, "text/html");
-  const runs = [];   // { t, v } ou { nl: true }
+  const runs = [];   // { t, v } or { nl: true }
   const BLOCK = /^(P|DIV|LI|H[1-6]|TR|BLOCKQUOTE|PRE)$/;
   function walk(node, bold, red) {
     if (node.nodeType === 3) {
-      // espaço com quebra de linha é formatação do código HTML (Word), não texto
+      // whitespace with a line break is HTML code formatting (Word), not text
       if (/^\s*$/.test(node.nodeValue) && /[\r\n]/.test(node.nodeValue)) return;
       const t = node.nodeValue.replace(/[\r\n]+/g, " ").replace(/\u00a0/g, " ");
       if (t) runs.push({ t, v: red ? "div" : bold ? "uni" : "min" });
@@ -406,7 +406,7 @@ function htmlToMarked(html) {
     if (/^(STYLE|SCRIPT|HEAD|TITLE|META|XML)$/.test(tag)) return;
     if (tag === "BR") { runs.push({ nl: true }); return; }
     const st = node.style || {};
-    // o Google Docs embrulha tudo num <b style="font-weight:normal">: o estilo manda
+    // Google Docs wraps everything in a <b style="font-weight:normal">: the style rules
     if (st.fontWeight) bold = st.fontWeight === "bold" || st.fontWeight === "bolder" || parseInt(st.fontWeight, 10) >= 600;
     else if (tag === "B" || tag === "STRONG") bold = true;
     const color = st.color || (tag === "FONT" && node.getAttribute("color"));
@@ -417,7 +417,7 @@ function htmlToMarked(html) {
     if (block) runs.push({ nl: true });
   }
   walk(doc.body, false, false);
-  // cada linha recebe a voz que predomina nos seus caracteres (empate: dividido)
+  // each line gets the voice that prevails in its characters (tie: split)
   const lines = [[]];
   for (const r of runs) { if (r.nl) lines.push([]); else lines[lines.length - 1].push(r); }
   const text = lines.map(line => {
@@ -435,9 +435,9 @@ function htmlToMarked(html) {
 }
 $("text").addEventListener("paste", (e) => {
   const html = e.clipboardData && e.clipboardData.getData("text/html");
-  if (!html) return;   // sem formatação: a colagem normal do navegador
+  if (!html) return;   // no formatting: the browser's normal paste
   const marked = htmlToMarked(html);
-  if (!/^\*/m.test(marked)) return;   // nenhuma linha em negrito/vermelho: a colagem normal
+  if (!/^\*/m.test(marked)) return;   // no bold/red line: the normal paste
   e.preventDefault();
   const ta = $("text");
   ta.setRangeText(marked, ta.selectionStart, ta.selectionEnd, "end");
@@ -445,20 +445,20 @@ $("text").addEventListener("paste", (e) => {
   setMsg("Colado com as vozes: linhas em negrito ganharam * (uníssono) e as vermelhas ** (dividido). Confira a pré-visualização.", "ok");
 });
 
-// ======================= estado da página =======================
+// ======================= page state =======================
 let state = null, lastHb = null, lastHbAt = 0, conn = "connecting";
-let loaded = null;      // { path, song, text, links, regions, dirty, readOnly } como veio do player
-// Associações em edição (D3): guardadas contra uma "base" (as seções do texto
-// quando a letra foi carregada ou quando uma associação foi escolhida) e
-// levadas para o texto atual pelo remapSections. Comparar sempre com a base,
-// e não com a tecla anterior, faz um título apagado e redigitado voltar a
-// achar a sua seção.
-let base = { sections: [], links: {} };   // links: { [guid]: { n, name } }, n = 0 é inválida
-let orphanLinks = [];   // associações de regions que não existem mais
-let lastLinks = {};     // as associações atuais da última renderização (para avisar o que mudou)
+let loaded = null;      // { path, song, text, links, regions, dirty, readOnly } as it came from the player
+// Links being edited (D3): kept against a "base" (the sections of the text
+// when the lyrics were loaded or when a link was chosen) and
+// carried to the current text by remapSections. Always comparing with the base,
+// and not with the previous keystroke, makes a title deleted and retyped find
+// its section again.
+let base = { sections: [], links: {} };   // links: { [guid]: { n, name } }, n = 0 is invalid
+let orphanLinks = [];   // links of regions that no longer exist
+let lastLinks = {};     // the current links of the last render (to warn about what changed)
 let saving = false;
 
-// { [guid]: { n, name } } no texto atual; n = 0 quando a seção não foi identificada
+// { [guid]: { n, name } } in the current text; n = 0 when the section was not identified
 function currentLinks(sections) {
   const map = remapSections(base.sections, sections), out = {};
   for (const g in base.links) {
@@ -528,7 +528,7 @@ function renderConn() {
   const [t, c] = PILLS[conn] || PILLS.connecting;
   $("pill").textContent = t; $("pill").className = "pill " + c;
   $("pair").classList.toggle("hidden", conn !== "unpaired");
-  // o editor continua visível (sem salvar) se a conexão cair com a letra aberta
+  // the editor stays visible (without saving) if the connection drops with the lyrics open
   $("editor").classList.toggle("hidden", !(conn === "ok" || (loaded && conn !== "unpaired")));
   const blk = BLOCKS[conn];
   $("blocker").classList.toggle("hidden", !blk);
@@ -537,7 +537,7 @@ function renderConn() {
   if (conn === "ok") buildSongs();
 }
 
-// lista de músicas: a aba ativa e as do setlist (só as abertas podem ser editadas)
+// song list: the active tab and the setlist ones (only the open ones can be edited)
 function buildSongs() {
   const list = state.setlist || [];
   const key = JSON.stringify(list.map(m => [m.name, m.open, !!m.clickOnly])) + (state.song && state.song.name) + !!state.clickSong;
@@ -590,10 +590,10 @@ async function loadSong(v) {
   renderEditor();
 }
 
-// ======================= edição =======================
+// ======================= editing =======================
 $("text").addEventListener("input", () => {
-  // as associações acompanham as seções; avisa quando alguma muda de número
-  // ou fica sem seção
+  // the links follow the sections; warns when one changes number
+  // or is left without a section
   const now = currentLinks(parseSections($("text").value).sections);
   let moved = 0, lost = 0;
   for (const g in now) {
@@ -647,7 +647,7 @@ function renderEditor() {
     if (cur && !cur.n) { add("lost", "(seção não encontrada: " + cur.name + ")"); td1.className = "bad"; sel.className = "bad"; }
     sel.value = cur ? (cur.n ? String(cur.n) : "lost") : "";
     sel.onchange = () => {
-      // escolher uma associação refaz a base com o texto atual
+      // choosing a link rebuilds the base with the current text
       const next = currentLinks(sections);
       if (sel.value === "") delete next[r.guid];
       else if (sel.value !== "lost") next[r.guid] = { n: +sel.value, name: sections[+sel.value - 1].name };
@@ -668,14 +668,14 @@ function renderEditor() {
   $("dirty").textContent = isDirty() || orphanLinks.length ? "Alterações não salvas" : "";
 }
 
-// ======================= salvar (tudo ou nada) =======================
+// ======================= save (all or nothing) =======================
 $("save").onclick = async () => {
   if (!loaded || saving) return;
   const text = $("text").value;
   if (!text.trim() && !confirm("A letra está vazia. Salvar assim apaga a letra desta música. Continuar?")) return;
   saving = true; renderConn();
   try {
-    // v2: número e nome da seção; 0 guarda uma associação sem seção (inválida)
+    // v2: section number and name; 0 keeps a link without a section (invalid)
     const links = currentLinks(parseSections(text).sections);
     let payload = "path\t" + enc(loaded.path) + "\nv2\ntext\t" + enc(text);
     for (const g of Object.keys(links)) payload += "\nlink\t" + g + "\t" + links[g].n + "\t" + enc(links[g].name);
@@ -683,7 +683,7 @@ $("save").onclick = async () => {
     const data = b64url(bytes), sha = sha256Hex(bytes), id = randomId(10);
     const parts = []; for (let i = 0; i < data.length; i += PART) parts.push(data.slice(i, i + PART));
     setMsg("Salvando…");
-    // as partes primeiro, o pedido de salvar por último
+    // the parts first, the save request last
     for (let i = 0; i < parts.length; i += PARTS_PER_REQ) {
       const cmds = [];
       for (let k = i; k < Math.min(parts.length, i + PARTS_PER_REQ); k++) {
@@ -709,7 +709,7 @@ $("save").onclick = async () => {
   } finally { saving = false; renderConn(); renderEditor(); }
 };
 
-// ======================= pareamento (o mesmo do controle) =======================
+// ======================= pairing (the same as the control) =======================
 $("pairBtn").onclick = async () => {
   const code = $("code").value.replace(/\D/g, "");
   if (code.length !== 6) { $("pairMsg").textContent = "Digite os 6 dígitos."; return; }
