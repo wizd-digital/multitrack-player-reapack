@@ -397,6 +397,7 @@ const store = {
 };
 function randomId(n) { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, b => "abcdefghijklmnopqrstuvwxyz0123456789"[b % 36]).join(""); }
 const dev = store.get("dev") || (() => { const d = "d" + randomId(15); store.set("dev", d); return d; })();
+let xUndo = false; // the PRÓXIMO card X is in undo state (jump-undo)
 let token = store.get("token");
 let seq = parseInt(store.get("seq") || "0", 10) || 0;
 function unescapeReaper(s) { return s.replace(/\\(.)/g, (_, c) => c === "n" ? "\n" : c === "t" ? "\t" : c); }
@@ -496,7 +497,7 @@ function handleAck(raw, now) {
       if (status === "stale") return finish(/^(Sl|Struct)/.test(pending.name || "") ? "Mudou no computador; confira e tente de novo." : "O estado mudou; confira e toque de novo.");
       if (status === "denied") { token = null; store.del("token"); return finish("Este tablet precisa ser pareado de novo."); }
       if (status === "off") return finish("Controle remoto desligado no computador.");
-      if (pending.name === "CancelJump") return finish("Tarde demais para cancelar o pulo.");
+      if (pending.name === "CancelJump") return finish(xUndo ? "Tarde demais para desfazer o pulo." : "Tarde demais para cancelar o pulo.");
       return finish("Não foi possível (veja o aviso na janela do player).");
     }
   }
@@ -640,7 +641,13 @@ function render() {
   renderTiming(s.timing);
   $("cNextN").textContent = [step ? step[2] + " de " + step[3] : "", nx.approx ? "aprox." : ""].filter(Boolean).join(" · ");
   // region-hover-and-group-colors D8: the X on the card whenever the window could cancel (absent in older players)
-  const xSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  // undo state (jump-undo): the X undoes the jump just made; absent in older players
+  const cancelSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  const undoSt = !cancelSt && (nx.undo === "ok" || nx.undo === "late") ? nx.undo : null;
+  const xSt = cancelSt || undoSt;
+  xUndo = !!undoSt;
+  $("cNextX").setAttribute("aria-label", undoSt ? "Desfazer o pulo" : "Cancelar o pulo");
+  $("cNextX").title = undoSt ? "Desfazer o pulo" : "Cancelar o pulo";
   $("cNextX").classList.toggle("hidden", !xSt);
   $("cNextX").classList.toggle("late", xSt === "late");
   $("cNextX").dataset.state = xSt || "";
@@ -891,7 +898,7 @@ $("mRegions").onclick = () => act("RegionsFromMarkers", null, $("mRegions"));
 $("mRecolor").onclick = () => act("RecolorRegions", null, $("mRecolor"));
 $("cNextX").onclick = () => {
   // dimmed = too late: nothing is sent, same as the X on the block
-  if ($("cNextX").dataset.state === "ok") act("CancelJump", null, $("cNextX")); else toast("Tarde demais para cancelar o pulo.");
+  if ($("cNextX").dataset.state === "ok") act("CancelJump", null, $("cNextX")); else toast(xUndo ? "Tarde demais para desfazer o pulo." : "Tarde demais para cancelar o pulo.");
 };
 $("sNew").onclick = () => { const n = prompt("Nome do novo setlist:"); if (n && n.trim()) act("SlNew", slv() + "|" + n.trim(), $("sNew")); };
 $("sRen").onclick = () => { if (!editor || !editor.setlist.name) return; const n = prompt("Novo nome do setlist:", editor.setlist.name); if (n && n.trim()) act("SlRename", slv() + "|" + n.trim(), $("sRen")); };

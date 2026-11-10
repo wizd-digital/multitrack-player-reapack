@@ -212,6 +212,7 @@
 // writes and reads ExtState in the MTP_Remote section; the player reads, runs and publishes.
 const SEC = "MTP_Remote";
 const POLL_MS = 200, BACKOFF_MS = [1000, 2000], CONFIRM_MS = 3000, STALE_HB_MS = 2000, HB_EVERY_MS = 2000;
+let xUndo = false; // the PRÓXIMO X is in undo state (jump-undo)
 // act: a window action by name; the phone only sends CancelJump, which needs the rev
 const SENSITIVE = { play: 1, pause: 1, prev: 1, next: 1, repeat: 1, loop: 1, click: 1, song: 1, act: 1 };
 const enc = encodeURIComponent;
@@ -357,7 +358,7 @@ function handleAck(raw, now) {
       if (status === "stale") return finish("O trecho mudou; confira e toque de novo.");
       if (status === "denied") { token = null; store.del("token"); return finish("Este aparelho precisa ser pareado de novo."); }
       if (status === "off") return finish("Controle remoto desligado no computador.");
-      if (pending.op === "act" && pending.arg === "CancelJump") return finish("Tarde demais para cancelar o pulo.");
+      if (pending.op === "act" && pending.arg === "CancelJump") return finish(xUndo ? "Tarde demais para desfazer o pulo." : "Tarde demais para cancelar o pulo.");
       return finish("Comando não aceito pelo player.");
     }
   }
@@ -468,7 +469,13 @@ function render() {
   $("nextNote").textContent = nx.approx ? "aprox." : "";
   renderTiming(state.timing, enabled);
   // region-hover-and-group-colors D8: the X whenever the window could cancel (absent in older players)
-  const xSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  // undo state (jump-undo): the X undoes the jump just made; absent in older players
+  const cancelSt = nx.pending && (nx.cancel === "ok" || nx.cancel === "late") ? nx.cancel : null;
+  const undoSt = !cancelSt && (nx.undo === "ok" || nx.undo === "late") ? nx.undo : null;
+  const xSt = cancelSt || undoSt;
+  xUndo = !!undoSt;
+  $("nextX").setAttribute("aria-label", undoSt ? "Desfazer o pulo" : "Cancelar o pulo");
+  $("nextX").title = undoSt ? "Desfazer o pulo" : "Cancelar o pulo";
   $("nextX").classList.toggle("hidden", !xSt);
   $("nextX").classList.toggle("late", xSt === "late");
   $("nextX").dataset.state = xSt || "";
@@ -540,7 +547,7 @@ document.querySelectorAll("#timing button").forEach(b => b.onclick = () => send(
 document.querySelectorAll("#controls button[data-op]").forEach(b => b.onclick = () => send(b.dataset.op, null, b));
 // dimmed = too late: nothing is sent, same as the X in the window
 $("nextX").onclick = () => {
-  if ($("nextX").dataset.state === "ok") send("act", "CancelJump", $("nextX")); else toast("Tarde demais para cancelar o pulo.");
+  if ($("nextX").dataset.state === "ok") send("act", "CancelJump", $("nextX")); else toast(xUndo ? "Tarde demais para desfazer o pulo." : "Tarde demais para cancelar o pulo.");
 };
 
 render();
