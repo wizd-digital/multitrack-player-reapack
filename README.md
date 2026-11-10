@@ -30,6 +30,7 @@ O ReaPack instala o player em `Scripts/Wizd Digital/Multitrack Player/` e já ca
 - `mp_play_pause.lua` (play/stop do player no Espaço, com o foco em qualquer lugar)
 - `mp_change_at_bar.lua` e `mp_change_now.lua` (momento da troca: fim do compasso e agora, para uma tecla ou pedal)
 - `mp_fade_out.lua` (saída de emergência: a VS cai até o silêncio e para, para uma tecla ou pedal)
+- `mp_timbre_1.lua` a `mp_timbre_8.lua`, `mp_timbre_next.lua` e `mp_timbre_prev.lua` (troca de timbre do projeto de timbres, para um botão do controlador)
 
 As vozes do guia falado (pasta `guides/`) vêm junto, sem download.
 

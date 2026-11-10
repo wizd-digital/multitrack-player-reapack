@@ -124,7 +124,7 @@
   #blocker b::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--warning); flex: none; }
   /* design-system: Wizd Digital credit, only outside the in-use screens */
   .credit { margin: 14px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
-  .credit b { color: var(--text); font-weight: 800; } .credit span { color: var(--accent); font-weight: 800; }
+  .credit img { height: 22px; width: auto; vertical-align: middle; margin-left: 6px; opacity: .9; }
 </style>
 </head>
 <body>
@@ -138,7 +138,7 @@
   <input id="code" class="code" inputmode="numeric" maxlength="6" placeholder="000000">
   <button id="pairBtn" class="on">PAREAR</button>
   <p id="pairMsg"></p>
-  <p class="credit">Desenvolvido por <b>Wizd</b><span>Digital</span></p>
+  <p class="credit">Desenvolvido por <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSIyNjMiIHZpZXdCb3g9IjAgMCAxMDAwIDI2MyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTA4LjIzMSIgeT0iODAuNzY5IiB3aWR0aD0iMzUuNTM4NSIgaGVpZ2h0PSIxMjEuODQ2IiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNDczLjc2OSA4MC43NjlWMjI4TDQ0My4zMDggMjAyLjYxNVYxMDYuMTU0TDQ3My43NjkgODAuNzY5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTUxOS40NjIgMTA2LjE1NEw1NDkuOTIzIDgwLjc2OVYyMDIuNjE1TDUxOS40NjIgMjI4VjEwNi4xNTRaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzcyLjIzMSA4MC43NjlMNDAyLjY5MiAxMDYuMTU0TDM3Mi4yMzEgMjAyLjYxNUgzMzEuNjE1TDM3Mi4yMzEgODAuNzY5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE4OS40NjEgODAuNzY5SDIyNVYxNzIuMTU0TDE4OS40NjEgMjAyLjYxNVY4MC43NjlaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNNjIuNTM4NSA4MC43NjlIMjdWMTcyLjE1NEw2Mi41Mzg1IDIwMi42MTVWODAuNzY5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTI0NS4zMDggODAuNzY5SDI4MC44NDZWMjAyLjYxNUwyNDUuMzA4IDE3Mi4xNTRWODAuNzY5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE0My43NjkgMjAyLjYxNkgxODkuNDYxTDE2MS41MzggMjI4SDE0My43NjlWMjAyLjYxNloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMDguMjMxIDIwMi42MTZINjIuNTM4Nkw5MC40NjE2IDIyOEgxMDguMjMxVjIwMi42MTZaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzcyLjIzMSAyMDIuNjE2SDQyM1YyMjhIMzcyLjIzMVYyMDIuNjE2WiIgZmlsbD0id2hpdGUiLz4KPHJlY3QgeD0iNDczLjc2OSIgeT0iMjAyLjYxNiIgd2lkdGg9IjQ1LjY5MjMiIGhlaWdodD0iMjUuMzg0NiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTQ3My43NjkgODAuNzY5SDUxOS40NjFWMTA2LjE1NEg0NzMuNzY5VjgwLjc2OVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik01MTkuNDYyIDMwSDU0OS45MjNWODAuNzY5Mkg1MTkuNDYyVjMwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTMyMS40NjIgODAuNzY5SDM3Mi4yMzFWMTA2LjE1NEgzMDEuMTU0TDMyMS40NjIgODAuNzY5WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTYzMC45NzkgMTc2LjIzMVYxMzAuNDhINjQ0LjQ0M0M2NDkuODAyIDEzMC40OCA2NTQuMjAzIDEzMS40MTcgNjU3LjY0NSAxMzMuMjkxQzY2MS4xMzEgMTM1LjEyMSA2NjMuNzAyIDEzNy43NTcgNjY1LjM1NyAxNDEuMTk5QzY2Ny4wNTcgMTQ0LjU5OCA2NjcuOTA2IDE0OC42OTMgNjY3LjkwNiAxNTMuNDg2QzY2Ny45MDYgMTU4LjE5MiA2NjcuMDU3IDE2Mi4yNDQgNjY1LjM1NyAxNjUuNjQzQzY2My43MDIgMTY5LjA0MiA2NjEuMTMxIDE3MS42NTYgNjU3LjY0NSAxNzMuNDg2QzY1NC4yMDMgMTc1LjMxNiA2NDkuODAyIDE3Ni4yMzEgNjQ0LjQ0MyAxNzYuMjMxSDYzMC45NzlaTTYzNi40NjkgMTcxLjY1Nkg2NDQuMzEyQzY0OC43NTYgMTcxLjY1NiA2NTIuMjg2IDE3MC45MzcgNjU0LjkgMTY5LjQ5OUM2NTcuNTE0IDE2OC4wMTggNjU5LjM4OCAxNjUuOTI2IDY2MC41MjEgMTYzLjIyNUM2NjEuNjU0IDE2MC40OCA2NjIuMjIgMTU3LjIzNCA2NjIuMjIgMTUzLjQ4NkM2NjIuMjIgMTQ5LjY1MiA2NjEuNjU0IDE0Ni4zNjIgNjYwLjUyMSAxNDMuNjE3QzY1OS4zODggMTQwLjg3MiA2NTcuNTE0IDEzOC43NTkgNjU0LjkgMTM3LjI3OEM2NTIuMjg2IDEzNS43OTYgNjQ4Ljc1NiAxMzUuMDU1IDY0NC4zMTIgMTM1LjA1NUg2MzYuNDY5VjE3MS42NTZaTTY5NS41ODQgMTc2LjIzMVYxMzAuNDhINzAxLjA3NFYxNzYuMjMxSDY5NS41ODRaTTc1MC4xODIgMTc3LjAxNUM3NDUuOTEyIDE3Ny4wMTUgNzQyLjE2NSAxNzYuMDM1IDczOC45NDEgMTc0LjA3NEM3MzUuNzE2IDE3Mi4wNyA3MzMuMjExIDE2OS4zMDMgNzMxLjQyNSAxNjUuNzc0QzcyOS42MzggMTYyLjI0NCA3MjguNzQ1IDE1OC4xMjcgNzI4Ljc0NSAxNTMuNDIxQzcyOC43NDUgMTQ4Ljc1OSA3MjkuNjM4IDE0NC42NDEgNzMxLjQyNSAxNDEuMDY4QzczMy4yNTUgMTM3LjQ5NSA3MzUuODI1IDEzNC43MDcgNzM5LjEzNyAxMzIuNzAyQzc0Mi40OTIgMTMwLjY5OCA3NDYuNDM1IDEyOS42OTYgNzUwLjk2NyAxMjkuNjk2Qzc1Ni4xMDggMTI5LjY5NiA3NjAuNCAxMzAuOTM4IDc2My44NDIgMTMzLjQyMUM3NjcuMjg0IDEzNS44NjEgNzY5LjQ4NSAxMzkuMjgyIDc3MC40NDMgMTQzLjY4M0g3NjQuMTA0Qzc2My40OTQgMTQwLjkzOCA3NjIuMDU2IDEzOC43NTkgNzU5Ljc5IDEzNy4xNDdDNzU3LjUyNCAxMzUuNTM1IDc1NC41ODMgMTM0LjcyOSA3NTAuOTY3IDEzNC43MjlDNzQ3LjYxMiAxMzQuNzI5IDc0NC42NzEgMTM1LjQ5MSA3NDIuMTQzIDEzNy4wMTZDNzM5LjY2IDEzOC40OTggNzM3Ljc0MyAxNDAuNjMzIDczNi4zOTIgMTQzLjQyMUM3MzUuMDQxIDE0Ni4yMSA3MzQuMzY2IDE0OS41NDMgNzM0LjM2NiAxNTMuNDIxQzczNC4zNjYgMTU3LjI5OSA3MzUuMDQxIDE2MC42NTQgNzM2LjM5MiAxNjMuNDg2QzczNy43NDMgMTY2LjI3NSA3MzkuNjE2IDE2OC40MSA3NDIuMDEzIDE2OS44OTFDNzQ0LjQ1MyAxNzEuMzczIDc0Ny4yNDEgMTcyLjExMyA3NTAuMzc4IDE3Mi4xMTNDNzU1LjI1OSAxNzIuMTEzIDc1OC45NCAxNzAuNjc2IDc2MS40MjQgMTY3LjhDNzYzLjkwOCAxNjQuOTI0IDc2NS4zMjQgMTYxLjAyNCA3NjUuNjcyIDE1Ni4xMDFINzUyLjQ3VjE1MS43ODdINzcxLjI5M1YxNzYuMjMxSDc2Ni4yNkw3NjUuODAzIDE2OC43MTVDNzY0LjcxNCAxNzAuNTAxIDc2My40NSAxNzIuMDI2IDc2Mi4wMTIgMTczLjI5Qzc2MC42MTggMTc0LjUxIDc1OC45NjIgMTc1LjQ0NyA3NTcuMDQ1IDE3Ni4xQzc1NS4xMjggMTc2LjcxIDc1Mi44NCAxNzcuMDE1IDc1MC4xODIgMTc3LjAxNVpNNzk5LjY0NiAxNzYuMjMxVjEzMC40OEg4MDUuMTM2VjE3Ni4yMzFINzk5LjY0NlpNODQ1LjI5MSAxNzYuMjMxVjEzNC45OUg4MzEuNjMxVjEzMC40OEg4NjQuNDQxVjEzNC45OUg4NTAuNzgxVjE3Ni4yMzFIODQ1LjI5MVpNODgyLjcwNSAxNzYuMjMxTDg5OS41NjcgMTMwLjQ4SDkwNS4zODRMOTIyLjE4MSAxNzYuMjMxSDkxNi4zNjRMOTAyLjQ0MyAxMzcuMzQzTDg4OC40NTYgMTc2LjIzMUg4ODIuNzA1Wk04OTAuNDE3IDE2NC40NjZMODkxLjk4NSAxNjAuMDIySDkxMi43MDRMOTE0LjI3MyAxNjQuNDY2SDg5MC40MTdaTTk0OC42NTUgMTc2LjIzMVYxMzAuNDhIOTU0LjE0NVYxNzEuODUySDk3NS40NTJWMTc2LjIzMUg5NDguNjU1WiIgZmlsbD0id2hpdGUiLz4KPHJlY3QgeD0iNTgxLjY1NCIgeT0iMzYuMzQ2NCIgd2lkdGg9IjQzLjE1MzgiIGhlaWdodD0iNDMuMTUzOCIgcng9IjIxLjU3NjkiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMi41Mzg0NiIvPgo8cGF0aCBkPSJNNjA5LjA5NCA2NC4xNDk5SDYwNi41ODFMNjA2LjYzMiA2Mi4zNzNMNjAxLjYwNiA1Ny4zMjE0TDYwMy4zMDcgNTUuMzY2OEg2MDYuNTgxVjQ4LjgxNzZINjAwLjY0MVY2NC4xNDk5SDU5OC4xMjhWNTAuOTc1M0w2MDAuMzM3IDQ4LjgxNzZINTk3LjgyNFY0Ni42MDkxSDYwNi44ODZMNjA5LjA5NCA0OC44MTc2VjU1LjA2MjJMNjA2Ljg4NiA1Ny4yNzA3SDYwNC44M1Y1Ny42MDA3TDYwOS4wOTQgNjEuODE0NVY2NC4xNDk5WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==" alt="Wizd Digital"></p>
 </div>
 
 <div id="editor" class="hidden">
@@ -511,6 +511,7 @@ async function poll() {
       else conn = "ok";
     }
   } catch (e) { conn = "retry"; }
+  autoPair();
   renderConn();
   clearTimeout(poll.timer); poll.timer = setTimeout(poll, POLL_MS);
 }
@@ -710,7 +711,7 @@ $("save").onclick = async () => {
 };
 
 // ======================= pairing (the same as the control) =======================
-$("pairBtn").onclick = async () => {
+async function pairNow() {
   const code = $("code").value.replace(/\D/g, "");
   if (code.length !== 6) { $("pairMsg").textContent = "Digite os 6 dígitos."; return; }
   const nonce = randomId(8), name = (store.get("name") || "Editor de letras").replace(/[|\n\t]/g, " ");
@@ -728,7 +729,30 @@ $("pairBtn").onclick = async () => {
     await sleep(200);
   }
   $("pairMsg").textContent = "Sem resposta do player.";
-};
+}
+$("pairBtn").onclick = pairNow;
+
+// ======================= pairing by QR code (qr-pairing) =======================
+// The QR on the REMOTO screen opens this page with "?pair=<6 digits>". The code is
+// taken out of the address right away (history and bookmarks never keep it), and
+// used once, only when the player says this device is not paired.
+let qrCode = null;
+try {
+  const u = new URL(location.href);
+  if (u.searchParams.has("pair")) {
+    const v = u.searchParams.get("pair") || "";
+    if (/^\d{6}$/.test(v)) qrCode = v;
+    u.searchParams.delete("pair");
+    history.replaceState(history.state, "", u.pathname + u.search + u.hash);
+  }
+} catch (e) { /* old browser: manual code entry, as before */ }
+function autoPair() {
+  if (!qrCode) return;
+  if (conn === "ok") { qrCode = null; return; }    // already paired: ignore the code
+  if (conn !== "unpaired") return;                 // wait for the player (closed, off, retry)
+  $("code").value = qrCode; qrCode = null;
+  pairNow();
+}
 
 poll();
 </script>
